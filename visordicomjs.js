@@ -21,8 +21,8 @@ const totalFrames = parseInt(urlParams.get('cortes')) || 50;
 
 // --- VARIABLES DE ADQUISICIÓN Y CONTROL DEL ESTUDIO ---
 const imagesCache = []; 
-let loadedCount = 1;   
-let currentIdx = 1;   
+let loadedCount = 0;   
+let currentIdx = 0;   
 
 // --- VARIABLES DE ESTADO DE FILTROS APLICADOS ---
 let filterInvert = false;
