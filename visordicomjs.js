@@ -116,6 +116,11 @@ function initPrecargar() {
         };
     }
 }
+function finalizarPrecarga() {
+    document.getElementById('loading-element').style.display = 'none'; // Oculta tu cargador si tienes uno
+    updateFrame(0); // Muestra la primera imagen
+    bindEvents();   // <--- ¡ESTA LÍNEA ES CRÍTICA! Activa los clics de todos los botones
+}
 
 // === 10. INICIALIZADOR AUTOMÁTICO AL CARGAR EL SCRIPT ===
 // Ejecuta automáticamente la precarga dinámica una vez que el DOM está listo
@@ -142,27 +147,63 @@ function updateFrame(index) {
 
 // === NUEVO: ESCUCHADOR DE EVENTOS DE INTERFAZ ===
 function bindEvents() {
-    // Evento del control deslizante (Slider)
-    slider.oninput = (e) => {
-        updateFrame(parseInt(e.target.value));
-    };
+    // 1. Control deslizante (Slider inferior)
+    if (slider) {
+        slider.oninput = (e) => {
+            updateFrame(parseInt(e.target.value, 10));
+        };
+    }
 
-    // Funcionalidad básica del botón Play / Cine Loop
-    btnPlay.onclick = () => {
-        if (isPlaying) {
-            clearInterval(playInterval);
-            btnPlay.classList.remove('active');
-            isPlaying = false;
-        } else {
-            btnPlay.classList.add('active');
-            isPlaying = true;
-            playInterval = setInterval(() => {
-                let nextIdx = currentIdx + 1;
-                if (nextIdx >= totalFrames) nextIdx = 0; // Bucle infinito
+    // 2. Botón Reproducir / Cine Loop (Play)
+    if (btnPlay) {
+        btnPlay.onclick = () => {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                btnPlay.classList.remove('active');
+                isPlaying = false;
+            } else {
+                btnPlay.classList.add('active');
+                isPlaying = true;
+                playInterval = setInterval(() => {
+                    let nextIdx = currentIdx + 1;
+                    if (nextIdx >= totalFrames) nextIdx = 0; // Bucle infinito
+                    updateFrame(nextIdx);
+                }, playSpeed);
+            }
+        };
+    }
+
+    // 3. Botón Restablecer (Reset)
+    if (btnReset) {
+        btnReset.onclick = () => {
+            if (isPlaying) btnPlay.click();
+            updateFrame(0);
+        };
+    }
+
+    // === NUEVO: SOLUCIÓN AL SCROLL DENTRO DEL IFRAME ===
+    // Escucha el scroll de la rueda del ratón directamente sobre el contenedor del visor
+    const visorContainer = document.querySelector('.visor-container');
+    if (visorContainer) {
+        visorContainer.addEventListener('wheel', (e) => {
+            e.preventDefault(); // Evita que la página completa de Blogger se mueva
+            
+            let nextIdx = currentIdx;
+            if (e.deltaY > 0) {
+                // Scroll hacia abajo -> Siguiente imagen
+                nextIdx = currentIdx + 1;
+            } else if (e.deltaY < 0) {
+                // Scroll hacia arriba -> Imagen anterior
+                nextIdx = currentIdx - 1;
+            }
+            
+            // Validar límites antes de actualizar
+            if (nextIdx >= 0 && nextIdx < totalFrames) {
                 updateFrame(nextIdx);
-            }, playSpeed);
-        }
-    };
+            }
+        }, { passive: false });
+    }
+}
 
     // Restablecer valores de fábrica (Reset)
     btnReset.onclick = () => {
