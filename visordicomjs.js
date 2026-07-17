@@ -21,10 +21,10 @@ const urlParams = new URLSearchParams(window.location.search);
 
 // 1. Nombre de la carpeta/álbum (por defecto 'img')
 let folderParam = urlParams.get('album') ? urlParams.get('album') : 'img';
+// Nos aseguramos de que termine con una barra /
 if (!folderParam.endsWith('/')) {
     folderParam += '/';
 }
-
 // 2. Cantidad de cortes (por defecto 60)
 const totalFrames = parseInt(urlParams.get('cortes')) || 60; 
 
@@ -67,10 +67,11 @@ let translateX = 0, translateY = 0;
 let lastTranslateX = 0, lastTranslateY = 0; 
 
 // === CONSTRUCTOR DINÁMICO DE RUTAS DE ARCHIVOS ===
-// CÓDIGO CORREGIDO Y 100% DINÁMICO
 function getImagePath(index) {
-    let path = `./${folderParam}${prefixParam}${index}.${extParam}`; // <--- CORREGIDO
-    return path.replace(/([^:]\/)\/+/g, "$1"); 
+    // Eliminamos el "." inicial para usar rutas relativas puras al dominio
+    let path = `${folderParam}${prefixParam}${index}.${extParam}`;
+    // Limpia cualquier doble barra accidental (ej: carpeta//archivo)
+    return path.replace(/\/+/g, "/"); 
 }
 
 // === 9. ALGORITMO DE DESCARGA PREVENTIVA / PRECARGA (UNIVERSAL) ===
