@@ -21,8 +21,8 @@ const totalFrames = parseInt(urlParams.get('cortes')) || 50;
 
 // --- VARIABLES DE ADQUISICIÓN Y CONTROL DEL ESTUDIO ---
 const imagesCache = []; 
-let loadedCount = 0;   
-let currentIdx = 0;   
+let loadedCount = 1;   
+let currentIdx = 1;   
 
 // --- VARIABLES DE ESTADO DE FILTROS APLICADOS ---
 let filterInvert = false;
@@ -49,7 +49,9 @@ let lastTranslateX = 0, lastTranslateY = 0;
 
 // --- CONSTRUCTOR DINÁMICO DE RUTAS DE ARCHIVOS MODIFICADO ---
 function getImagePath(index) {
-    return `${folderParam}corte_${index}.jpg`; 
+    // Une la carpeta y el archivo, y limpia cualquier doble barra '//' que se genere por error
+    let path = `${folderParam}corte_${index}.jpg`;
+    return path.replace(/([^:]\/)\/+/g, "$1"); 
 }
 
 // --- ALGORITMO DE DESCARGA PREVENTIVA (PRECARGA EN CACHÉ RAM) ---
