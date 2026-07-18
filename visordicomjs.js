@@ -233,7 +233,6 @@ function bindEvents() {
         }
     };
 
-    // === LÓGICA DE ARRASTRE CENTRALIZADA ===
     // Variables adicionales para el control de frames táctil
     let startFrameY = 0;
     let startFrameIdx = 0;
@@ -247,7 +246,6 @@ function bindEvents() {
         if (isContrasteToolEnabled) {
             isPressedToAdjust = true;
         } else if (!isZoomed) {
-            // Guardar estado inicial para cambiar de imágenes con deslizamiento vertical
             startFrameY = clientY;
             startFrameIdx = currentIdx;
         }
@@ -259,20 +257,16 @@ function bindEvents() {
         let deltaY = clientY - startY;
 
         if (isZoomed) {
-            // Modo Paneo con zoom activo
             translateX = lastTranslateX + deltaX;
             translateY = lastTranslateY + deltaY;
             aplicarEstilosVisuales();
         } else if (isContrasteToolEnabled && isPressedToAdjust) {
-            // Modo Ajuste Ventana/Nivel
             brightnessLevel = Math.max(20, Math.min(250, baseBrightness - (deltaY * 0.5)));
             contrastLevel = Math.max(30, Math.min(300, baseContrast - (deltaX * 0.5)));
             statusText.textContent = `Brillo: ${Math.round(brightnessLevel)}% | Contraste: ${Math.round(contrastLevel)}%`;
             aplicarEstilosVisuales();
         } else {
-            // Modo Desplazamiento de cortes (Filtros desactivados)
             let diffY = clientY - startFrameY;
-            // Sensibilidad: Cada 8 píxeles de movimiento vertical cambia 1 imagen
             let frameOffset = Math.floor(diffY / 8); 
             let targetIdx = startFrameIdx + frameOffset;
             
@@ -310,20 +304,19 @@ function bindEvents() {
     window.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
     window.onmouseup = endDrag;
 
-// === CAPTURAS TÁCTILES MÓVILES CORREGIDAS ===
+    // === CAPTURAS TÁCTILES MÓVILES SINTAXIS REPARADA ===
     imgElement.addEventListener('touchstart', (e) => {
         if (e.touches && e.touches.length === 1) {
-            // Accede de forma segura a las coordenadas del primer dedo en el array
             startDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
-    }, { passive: true }); // Permite que el toque inicial se ejecute de inmediato
+    }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
         if (isDragging && e.touches && e.touches.length === 1) {
-            // Cancela el scroll del blog obligatoriamente al arrastrar dentro del visor
-            e.preventDefault(); 
+            e.preventDefault(); // Bloquea el scroll de la web con éxito
             moveDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
-    }, { passive: false }); // REQUERIDO: Informa al navegador que se va a anular el scroll nativo
+    }, { passive: false }); // SINTAXIS CORREGIDA: Se eliminó la coma errónea anterior
 
     window.addEventListener('touchend', endDrag);
+}
