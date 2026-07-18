@@ -97,7 +97,12 @@ body {
     position: relative;
     width: 100%;
     max-width: 600px;
-    aspect-ratio: 1 / 1;
+    
+    /* MODIFICACIÓN: Elimina el 1 / 1 y forzar ajuste dinámico al alto del dispositivo */
+    aspect-ratio: auto;        
+    height: auto;
+    max-height: 70vh;          /* Evita que la imagen empuje los controles fuera de la pantalla móvil */
+    
     background: #000;
     border: 1px solid #333;
     overflow: hidden; 
@@ -108,8 +113,6 @@ body {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    
-    /* SOLUCIÓN AL SCROLL MÓVIL: Bloquea los gestos del navegador sobre este contenedor */
     touch-action: none; 
 }
 
