@@ -93,7 +93,6 @@ body {
 }
 
 /* // CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK) */
-/* Clava la proporción perfectamente cuadrada (1/1) y bloquea selecciones de texto nativas */
 .frame-wrapper {
     position: relative;
     width: 100%;
@@ -109,6 +108,9 @@ body {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    
+    /* SOLUCIÓN AL SCROLL MÓVIL: Bloquea los gestos del navegador sobre este contenedor */
+    touch-action: none; 
 }
 
 /* // RENDERIZADO OPTIMIZADO POR HARDWARE DE LA IMAGEN MÉDICA */
