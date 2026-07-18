@@ -1,6 +1,6 @@
 /**
  * Visor DICOM Profesional Completo para Blogger
- * Versión Dinámica con Parámetros de URL
+ * Versión Dinámica con Parámetros de URL - Integrado con Motor Visual
  */
 
 // === 1. CAPTURA DE VARIABLES INTERNAS DEL ÁRBOL DOM ===
@@ -21,7 +21,6 @@ const urlParams = new URLSearchParams(window.location.search);
 
 // 1. Nombre de la carpeta/álbum (por defecto 'img')
 let folderParam = urlParams.get('album') ? urlParams.get('album') : 'img';
-// Nos aseguramos de que termine con una barra /
 if (!folderParam.endsWith('/')) {
     folderParam += '/';
 }
@@ -31,11 +30,10 @@ const totalFrames = parseInt(urlParams.get('cortes')) || 60;
 // 3. Prefijo del nombre de la imagen (por defecto usa 'corte_')
 const prefixParam = urlParams.get('prefix') ? urlParams.get('prefix') : 'corte_';
 
-// 4. NUEVO Y CLAVE: Número de inicio del conteo (por defecto toma 1, si no se especifica)
+// 4. Número de inicio del conteo (por defecto toma 1)
 const startParam = urlParams.get('start') !== null ? parseInt(urlParams.get('start')) : 1;
 
-// 4. NUEVO Y DINÁMICO: Extensión del archivo (por defecto 'jpg')
-// Te permite alternar entre jpg, png, JPG, PNG, etc., según lo que subas a GitHub
+// 5. Extensión del archivo (por defecto 'jpg')
 const extParam = urlParams.get('ext') ? urlParams.get('ext') : 'jpg';
 
 // === 3. VARIABLES DE ADQUISICIÓN Y CONTROL DEL ESTUDIO ===
@@ -68,9 +66,7 @@ let lastTranslateX = 0, lastTranslateY = 0;
 
 // === CONSTRUCTOR DINÁMICO DE RUTAS DE ARCHIVOS ===
 function getImagePath(index) {
-    // Eliminamos el "." inicial para usar rutas relativas puras al dominio
     let path = `${folderParam}${prefixParam}${index}.${extParam}`;
-    // Limpia cualquier doble barra accidental (ej: carpeta//archivo)
     return path.replace(/\/+/g, "/"); 
 }
 
@@ -78,11 +74,10 @@ function getImagePath(index) {
 function initPrecargar() {
     loadedCount = 0; 
     slider.max = totalFrames - 1;
-    imagesCache.length = 0; // Limpia la caché
+    imagesCache.length = 0; 
 
-    // El ciclo calcula dinámicamente los nombres basándose en el parámetro 'startParam'
     for (let i = 0; i < totalFrames; i++) {
-        const imageNumber = startParam + i; // Si start es 1, procesará: 1, 2, 3...
+        const imageNumber = startParam + i; 
         
         const img = new Image();
         img.src = getImagePath(imageNumber);
@@ -95,7 +90,7 @@ function initPrecargar() {
             if (loadedCount === totalFrames) {
                 statusText.textContent = "Estudio Médico Listo";
                 slider.disabled = false;
-                updateFrame(0); // Muestra el primer elemento guardado en la caché
+                updateFrame(0); 
                 if (typeof bindEvents === 'function') {
                     bindEvents(); 
                 }
@@ -118,56 +113,207 @@ function initPrecargar() {
 }
 
 // === 10. INICIALIZADOR AUTOMÁTICO AL CARGAR EL SCRIPT ===
-// Ejecuta automáticamente la precarga dinámica una vez que el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     initPrecargar();
 });
-// === NUEVO: MOTOR DE ACTUALIZACIÓN DE IMÁGENES ===
+// === MOTOR DE ACTUALIZACIÓN DE IMÁGENES ===
 function updateFrame(index) {
     if (index < 0 || index >= totalFrames) return;
     currentIdx = index;
     
-    // Cambia la imagen visible usando la caché precargada
     if (imagesCache[index] && imagesCache[index].complete) {
         imgElement.src = imagesCache[index].src;
     } else {
-        // Alternativa si no ha cargado del todo
         imgElement.src = getImagePath(startParam + index);
     }
     
-    // Actualiza los componentes visuales del visor
     slider.value = index;
     counter.textContent = `${index + 1} / ${totalFrames}`;
+    aplicarEstilosVisuales(); // INTEGRADO: Aplica los filtros CSS en cada render
 }
 
-// === NUEVO: ESCUCHADOR DE EVENTOS DE INTERFAZ ===
+// === NUEVA FUNCIÓN INTEGRADA: MOTOR DE PROCESAMIENTO VISUAL ===
+function aplicarEstilosVisuales() {
+    let invertValue = filterInvert ? 'invert(100%)' : 'invert(0%)';
+    imgElement.style.filter = `${invertValue} contrast(${contrastLevel}%) brightness(${brightnessLevel}%)`;
+
+    if (isZoomed) {
+        imgElement.style.transform = `scale(2.2) translate(${translateX / 2.2}px, ${translateY / 2.2}px)`;
+        imgElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+    } else if (isContrasteToolEnabled) {
+        imgElement.style.transform = 'scale(1) translate(0px, 0px)';
+        imgElement.style.cursor = 'move'; 
+    } else {
+        imgElement.style.transform = 'scale(1) translate(0px, 0px)';
+        imgElement.style.cursor = 'default'; 
+    }
+}
+
+// === NUEVA FUNCIÓN INTEGRADA: INTERRUPTOR DE MODO ZOOM ===
+function toggleZoom() {
+    if (isContrasteToolEnabled) toggleContrasteTool(); 
+    isZoomed = !isZoomed;
+    btnZoom.classList.toggle('active', isZoomed);
+    btnZoom.textContent = isZoomed ? "🔍 Normal" : "🔍 Zoom";
+    if (!isZoomed) {
+        translateX = 0; translateY = 0;
+        lastTranslateX = 0; lastTranslateY = 0;
+    }
+    aplicarEstilosVisuales();
+}
+
+// === NUEVA FUNCIÓN INTEGRADA: INTERRUPTOR DE HERRAMIENTA CONTRASTE ===
+function toggleContrasteTool() {
+    if (isZoomed) toggleZoom(); 
+    isContrasteToolEnabled = !isContrasteToolEnabled;
+    btnContraste.classList.toggle('active', isContrasteToolEnabled);
+    aplicarEstilosVisuales();
+}
+
+// === ESCUCHADOR DE EVENTOS DE INTERFAZ Y HARDWARE ===
 function bindEvents() {
     // Evento del control deslizante (Slider)
     slider.oninput = (e) => {
+        if (isPlaying) btnPlay.click(); // Detiene la reproducción al arrastrar el slider
         updateFrame(parseInt(e.target.value));
     };
 
-    // Funcionalidad básica del botón Play / Cine Loop
+    // Funcionalidad del botón Play / Cine Loop (Sincronizado)
     btnPlay.onclick = () => {
         if (isPlaying) {
             clearInterval(playInterval);
             btnPlay.classList.remove('active');
+            btnPlay.textContent = "▶ Autoplay";
             isPlaying = false;
         } else {
             btnPlay.classList.add('active');
+            btnPlay.textContent = "⏸ Pausa";
             isPlaying = true;
             playInterval = setInterval(() => {
                 let nextIdx = currentIdx + 1;
-                if (nextIdx >= totalFrames) nextIdx = 0; // Bucle infinito
+                if (nextIdx >= totalFrames) nextIdx = 0; 
                 updateFrame(nextIdx);
+                
+                // Desplazamiento automático de la página (Scroll sincronizado)
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                if (maxScroll > 0) {
+                    window.scrollTo(0, (nextIdx / (totalFrames - 1)) * maxScroll);
+                }
             }, playSpeed);
         }
     };
 
-    // Restablecer valores de fábrica (Reset)
+    // Botón de Inversión de Color
+    btnInvert.onclick = () => {
+        filterInvert = !filterInvert;
+        btnInvert.classList.toggle('active', filterInvert);
+        aplicarEstilosVisuales();
+    };
+
+    // Asignación de nuevas herramientas a los botones existentes
+    btnContraste.onclick = toggleContrasteTool;
+    btnZoom.onclick = toggleZoom;
+
+    // Restablecer valores de fábrica (Reset optimizado)
     btnReset.onclick = () => {
         if (isPlaying) btnPlay.click();
+        filterInvert = false;
+        brightnessLevel = 100;
+        contrastLevel = 100;
+        baseBrightness = 100;
+        baseContrast = 100;
+        isContrasteToolEnabled = false;
+        isPressedToAdjust = false;
+        isZoomed = false;
+        translateX = 0; translateY = 0;
+        lastTranslateX = 0; lastTranslateY = 0;
+        
+        btnInvert.classList.remove('active');
+        btnContraste.classList.remove('active');
+        btnZoom.classList.remove('active');
+        btnZoom.textContent = "🔍 Zoom";
+        statusText.textContent = "Estudio Médico Listo";
+        
         updateFrame(0);
-        // Aquí puedes reiniciar tus variables de zoom y contraste si añades sus lógicas
     };
+
+    // === INTEGRACIÓN DE EVENTOS DE RUEDA (MOUSE WHEEL) ===
+    wrapper.onwheel = (e) => {
+        e.preventDefault(); 
+        if (isPlaying) btnPlay.click();
+        let targetIdx = currentIdx + (e.deltaY > 0 ? 1 : -1);
+        if (targetIdx >= 0 && targetIdx < totalFrames) {
+            updateFrame(targetIdx);
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            if (maxScroll > 0) {
+                window.scrollTo(0, (targetIdx / (totalFrames - 1)) * maxScroll);
+            }
+        }
+    };
+
+    // === INTEGRACIÓN DEL SISTEMA GESTUAL DE ARRASTRE (RATÓN) ===
+    const startDrag = (clientX, clientY) => {
+        if (!isZoomed && !isContrasteToolEnabled) return;
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        if (isContrasteToolEnabled) isPressedToAdjust = true;
+    };
+
+    const moveDrag = (clientX, clientY) => {
+        if (!isDragging) return;
+        let deltaX = clientX - startX;
+        let deltaY = clientY - startY;
+
+        if (isZoomed) {
+            translateX = lastTranslateX + deltaX;
+            translateY = lastTranslateY + deltaY;
+        } else if (isContrasteToolEnabled && isPressedToAdjust) {
+            brightnessLevel = Math.max(20, Math.min(250, baseBrightness - (deltaY * 0.5)));
+            contrastLevel = Math.max(30, Math.min(300, baseContrast - (deltaX * 0.5)));
+            statusText.textContent = `Brillo: ${Math.round(brightnessLevel)}% | Contraste: ${Math.round(contrastLevel)}%`;
+        }
+        aplicarEstilosVisuales();
+    };
+
+    const endDrag = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        if (isZoomed) {
+            lastTranslateX = translateX;
+            lastTranslateY = translateY;
+        } else if (isContrasteToolEnabled) {
+            baseBrightness = brightnessLevel;
+            baseContrast = contrastLevel;
+            isPressedToAdjust = false;
+            isContrasteToolEnabled = false; 
+            btnContraste.classList.remove('active'); 
+            statusText.textContent = "Estudio Médico Listo";
+        }
+        aplicarEstilosVisuales();
+    };
+
+    // Bloqueo de menú contextual en la imagen
+    wrapper.oncontextmenu = (e) => e.preventDefault();
+
+    imgElement.onmousedown = (e) => {
+        e.preventDefault(); 
+        if (e.button === 0) startDrag(e.clientX, e.clientY);
+    };
+
+    window.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
+    window.onmouseup = endDrag;
+
+    // === CONTROL DE GESTOS TÁCTILES (MÓVILES) ===
+    imgElement.ontouchstart = (e) => {
+        if (isPlaying) btnPlay.click(); 
+        if (e.touches.length === 1) startDrag(e.touches.clientX, e.touches.clientY);
+    };
+
+    window.ontouchmove = (e) => {
+        if (e.touches.length === 1) moveDrag(e.touches.clientX, e.touches.clientY);
+    };
+
+    window.ontouchend = endDrag;
 }
