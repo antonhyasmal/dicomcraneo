@@ -233,13 +233,24 @@ function bindEvents() {
         }
     };
 
-    // === GESTIÓN DE ARRASTRE UNIFICADA (MOUSE Y TOUCH) ===
+    // === LÓGICA DE ARRASTRE CENTRALIZADA ===
+    // Variables adicionales para el control de frames táctil
+    let startFrameY = 0;
+    let startFrameIdx = 0;
+
     const startDrag = (clientX, clientY) => {
-        if (!isZoomed && !isContrasteToolEnabled) return;
+        if (isPlaying) btnPlay.click();
         isDragging = true;
         startX = clientX;
         startY = clientY;
-        if (isContrasteToolEnabled) isPressedToAdjust = true;
+
+        if (isContrasteToolEnabled) {
+            isPressedToAdjust = true;
+        } else if (!isZoomed) {
+            // Guardar estado inicial para cambiar de imágenes con deslizamiento vertical
+            startFrameY = clientY;
+            startFrameIdx = currentIdx;
+        }
     };
 
     const moveDrag = (clientX, clientY) => {
@@ -248,14 +259,27 @@ function bindEvents() {
         let deltaY = clientY - startY;
 
         if (isZoomed) {
+            // Modo Paneo con zoom activo
             translateX = lastTranslateX + deltaX;
             translateY = lastTranslateY + deltaY;
+            aplicarEstilosVisuales();
         } else if (isContrasteToolEnabled && isPressedToAdjust) {
+            // Modo Ajuste Ventana/Nivel
             brightnessLevel = Math.max(20, Math.min(250, baseBrightness - (deltaY * 0.5)));
             contrastLevel = Math.max(30, Math.min(300, baseContrast - (deltaX * 0.5)));
             statusText.textContent = `Brillo: ${Math.round(brightnessLevel)}% | Contraste: ${Math.round(contrastLevel)}%`;
+            aplicarEstilosVisuales();
+        } else {
+            // Modo Desplazamiento de cortes (Filtros desactivados)
+            let diffY = clientY - startFrameY;
+            // Sensibilidad: Cada 8 píxeles de movimiento vertical cambia 1 imagen
+            let frameOffset = Math.floor(diffY / 8); 
+            let targetIdx = startFrameIdx + frameOffset;
+            
+            if (targetIdx >= 0 && targetIdx < totalFrames && targetIdx !== currentIdx) {
+                updateFrame(targetIdx);
+            }
         }
-        aplicarEstilosVisuales();
     };
 
     const endDrag = () => {
@@ -272,13 +296,13 @@ function bindEvents() {
             isContrasteToolEnabled = false; 
             btnContraste.classList.remove('active'); 
             statusText.textContent = "Estudio Médico Listo";
+            aplicarEstilosVisuales();
         }
-        aplicarEstilosVisuales();
     };
 
     wrapper.oncontextmenu = (e) => e.preventDefault();
 
-    // Eventos de Mouse de Escritorio
+    // Capturas para Mouse de Escritorio
     imgElement.onmousedown = (e) => {
         e.preventDefault(); 
         if (e.button === 0) startDrag(e.clientX, e.clientY);
@@ -286,22 +310,21 @@ function bindEvents() {
     window.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
     window.onmouseup = endDrag;
 
-    // === CORRECCIÓN EXCLUSIVA PARA CELULARES (EVENTOS TOUCH ACTUALIZADOS) ===
+    // === CAPTURAS TÁCTILES MÓVILES TOTALMENTE OPTIMIZADAS ===
     imgElement.ontouchstart = (e) => {
-        if (isPlaying) btnPlay.click(); 
         if (e.touches && e.touches.length === 1) {
-            // Lee el primer dedo apoyado en la pantalla
+            // Corrección: Leer propiedad clientX/Y dentro del índice [0] del toque
             startDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
     };
 
     window.ontouchmove = (e) => {
         if (isDragging && e.touches && e.touches.length === 1) {
-            // Evita que la pantalla del celular se desplace (scroll) mientras arrastras
+            // Cancela el scroll del navegador móvil para permitir operar el visor fluidamente
             e.preventDefault(); 
             moveDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
-    }, { passive: false }; // Permite el uso de preventDefault en navegadores móviles modernos
+    }, { passive: false }; 
 
     window.ontouchend = endDrag;
 }
