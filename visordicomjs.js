@@ -19,33 +19,25 @@ const btnReset = document.getElementById('btnReset');
 // === LECTOR DE PARÁMETROS DINÁMICOS DESDE LA URL ===
 const urlParams = new URLSearchParams(window.location.search);
 
-// 1. Nombre de la carpeta/álbum (por defecto 'img')
 let folderParam = urlParams.get('album') ? urlParams.get('album') : 'img';
 if (!folderParam.endsWith('/')) {
     folderParam += '/';
 }
-// 2. Cantidad de cortes (por defecto 60)
 const totalFrames = parseInt(urlParams.get('cortes')) || 60; 
-
-// 3. Prefijo del nombre de la imagen (por defecto usa 'corte_')
 const prefixParam = urlParams.get('prefix') ? urlParams.get('prefix') : 'corte_';
-
-// 4. Número de inicio del conteo (por defecto toma 1)
 const startParam = urlParams.get('start') !== null ? parseInt(urlParams.get('start')) : 1;
-
-// 5. Extensión del archivo (por defecto 'jpg')
 const extParam = urlParams.get('ext') ? urlParams.get('ext') : 'jpg';
 
-// === 3. VARIABLES DE ADQUISICIÓN Y CONTROL DEL ESTUDIO ===
+// === VARIABLES DE ADQUISICIÓN Y CONTROL DEL ESTUDIO ===
 const imagesCache = []; 
 let loadedCount = 0;   
 let currentIdx = 0;     
 
-// === 4. VARIABLES DE ESTADO DE FILTROS APLICADOS ===
+// === VARIABLES DE ESTADO DE FILTROS APLICADOS ===
 let filterInvert = false;
 let isZoomed = false;
 
-// === 5. VARIABLES DE CALIBRACIÓN DE ILUMINACIÓN (VENTANA/NIVEL) ===
+// === VARIABLES DE CALIBRACIÓN DE ILUMINACIÓN ===
 let isContrasteToolEnabled = false; 
 let isPressedToAdjust = false;      
 let brightnessLevel = 100;        
@@ -53,12 +45,12 @@ let contrastLevel = 100;
 let baseBrightness = 100;         
 let baseContrast = 100;           
 
-// === 6. VARIABLES DE LA FUNCIÓN AUTOMÁTICA (CINE LOOP) ===
+// === VARIABLES DE LA FUNCIÓN AUTOMÁTICA (CINE LOOP) ===
 let isPlaying = false;
 let playInterval = null;
 const playSpeed = 60; 
 
-// === 7. VARIABLES DEL MOTOR DE ARRASTRE DE ZOOM (PANEO) ===
+// === VARIABLES DEL MOTOR DE ARRASTRE DE ZOOM (PANEO) ===
 let isDragging = false;
 let startX = 0, startY = 0;
 let translateX = 0, translateY = 0;
@@ -70,7 +62,7 @@ function getImagePath(index) {
     return path.replace(/\/+/g, "/"); 
 }
 
-// === 9. ALGORITMO DE DESCARGA PREVENTIVA / PRECARGA (UNIVERSAL) ===
+// === ALGORITMO DE DESCARGA PREVENTIVA / PRECARGA ===
 function initPrecargar() {
     loadedCount = 0; 
     slider.max = totalFrames - 1;
@@ -112,7 +104,6 @@ function initPrecargar() {
     }
 }
 
-// === 10. INICIALIZADOR AUTOMÁTICO AL CARGAR EL SCRIPT ===
 document.addEventListener('DOMContentLoaded', () => {
     initPrecargar();
 });
@@ -129,10 +120,10 @@ function updateFrame(index) {
     
     slider.value = index;
     counter.textContent = `${index + 1} / ${totalFrames}`;
-    aplicarEstilosVisuales(); // INTEGRADO: Aplica los filtros CSS en cada render
+    aplicarEstilosVisuales();
 }
 
-// === NUEVA FUNCIÓN INTEGRADA: MOTOR DE PROCESAMIENTO VISUAL ===
+// === MOTOR DE PROCESAMIENTO VISUAL ===
 function aplicarEstilosVisuales() {
     let invertValue = filterInvert ? 'invert(100%)' : 'invert(0%)';
     imgElement.style.filter = `${invertValue} contrast(${contrastLevel}%) brightness(${brightnessLevel}%)`;
@@ -149,7 +140,6 @@ function aplicarEstilosVisuales() {
     }
 }
 
-// === NUEVA FUNCIÓN INTEGRADA: INTERRUPTOR DE MODO ZOOM ===
 function toggleZoom() {
     if (isContrasteToolEnabled) toggleContrasteTool(); 
     isZoomed = !isZoomed;
@@ -162,7 +152,6 @@ function toggleZoom() {
     aplicarEstilosVisuales();
 }
 
-// === NUEVA FUNCIÓN INTEGRADA: INTERRUPTOR DE HERRAMIENTA CONTRASTE ===
 function toggleContrasteTool() {
     if (isZoomed) toggleZoom(); 
     isContrasteToolEnabled = !isContrasteToolEnabled;
@@ -172,13 +161,11 @@ function toggleContrasteTool() {
 
 // === ESCUCHADOR DE EVENTOS DE INTERFAZ Y HARDWARE ===
 function bindEvents() {
-    // Evento del control deslizante (Slider)
     slider.oninput = (e) => {
-        if (isPlaying) btnPlay.click(); // Detiene la reproducción al arrastrar el slider
+        if (isPlaying) btnPlay.click();
         updateFrame(parseInt(e.target.value));
     };
 
-    // Funcionalidad del botón Play / Cine Loop (Sincronizado)
     btnPlay.onclick = () => {
         if (isPlaying) {
             clearInterval(playInterval);
@@ -194,7 +181,6 @@ function bindEvents() {
                 if (nextIdx >= totalFrames) nextIdx = 0; 
                 updateFrame(nextIdx);
                 
-                // Desplazamiento automático de la página (Scroll sincronizado)
                 const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
                 if (maxScroll > 0) {
                     window.scrollTo(0, (nextIdx / (totalFrames - 1)) * maxScroll);
@@ -203,18 +189,15 @@ function bindEvents() {
         }
     };
 
-    // Botón de Inversión de Color
     btnInvert.onclick = () => {
         filterInvert = !filterInvert;
         btnInvert.classList.toggle('active', filterInvert);
         aplicarEstilosVisuales();
     };
 
-    // Asignación de nuevas herramientas a los botones existentes
     btnContraste.onclick = toggleContrasteTool;
     btnZoom.onclick = toggleZoom;
 
-    // Restablecer valores de fábrica (Reset optimizado)
     btnReset.onclick = () => {
         if (isPlaying) btnPlay.click();
         filterInvert = false;
@@ -237,7 +220,6 @@ function bindEvents() {
         updateFrame(0);
     };
 
-    // === INTEGRACIÓN DE EVENTOS DE RUEDA (MOUSE WHEEL) ===
     wrapper.onwheel = (e) => {
         e.preventDefault(); 
         if (isPlaying) btnPlay.click();
@@ -251,7 +233,7 @@ function bindEvents() {
         }
     };
 
-    // === INTEGRACIÓN DEL SISTEMA GESTUAL DE ARRASTRE (RATÓN) ===
+    // === GESTIÓN DE ARRASTRE UNIFICADA (MOUSE Y TOUCH) ===
     const startDrag = (clientX, clientY) => {
         if (!isZoomed && !isContrasteToolEnabled) return;
         isDragging = true;
@@ -294,26 +276,32 @@ function bindEvents() {
         aplicarEstilosVisuales();
     };
 
-    // Bloqueo de menú contextual en la imagen
     wrapper.oncontextmenu = (e) => e.preventDefault();
 
+    // Eventos de Mouse de Escritorio
     imgElement.onmousedown = (e) => {
         e.preventDefault(); 
         if (e.button === 0) startDrag(e.clientX, e.clientY);
     };
-
     window.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
     window.onmouseup = endDrag;
 
-    // === CONTROL DE GESTOS TÁCTILES (MÓVILES) ===
+    // === CORRECCIÓN EXCLUSIVA PARA CELULARES (EVENTOS TOUCH ACTUALIZADOS) ===
     imgElement.ontouchstart = (e) => {
         if (isPlaying) btnPlay.click(); 
-        if (e.touches.length === 1) startDrag(e.touches.clientX, e.touches.clientY);
+        if (e.touches && e.touches.length === 1) {
+            // Lee el primer dedo apoyado en la pantalla
+            startDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }
     };
 
     window.ontouchmove = (e) => {
-        if (e.touches.length === 1) moveDrag(e.touches.clientX, e.touches.clientY);
-    };
+        if (isDragging && e.touches && e.touches.length === 1) {
+            // Evita que la pantalla del celular se desplace (scroll) mientras arrastras
+            e.preventDefault(); 
+            moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }, { passive: false }; // Permite el uso de preventDefault en navegadores móviles modernos
 
     window.ontouchend = endDrag;
 }
