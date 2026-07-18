@@ -310,21 +310,20 @@ function bindEvents() {
     window.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
     window.onmouseup = endDrag;
 
-    // === CAPTURAS TÁCTILES MÓVILES TOTALMENTE OPTIMIZADAS ===
-    imgElement.ontouchstart = (e) => {
+// === CAPTURAS TÁCTILES MÓVILES CORREGIDAS ===
+    imgElement.addEventListener('touchstart', (e) => {
         if (e.touches && e.touches.length === 1) {
-            // Corrección: Leer propiedad clientX/Y dentro del índice [0] del toque
+            // Accede de forma segura a las coordenadas del primer dedo en el array
             startDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
-    };
+    }, { passive: true }); // Permite que el toque inicial se ejecute de inmediato
 
-    window.ontouchmove = (e) => {
+    window.addEventListener('touchmove', (e) => {
         if (isDragging && e.touches && e.touches.length === 1) {
-            // Cancela el scroll del navegador móvil para permitir operar el visor fluidamente
+            // Cancela el scroll del blog obligatoriamente al arrastrar dentro del visor
             e.preventDefault(); 
             moveDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
-    }, { passive: false }; 
+    }, { passive: false }); // REQUERIDO: Informa al navegador que se va a anular el scroll nativo
 
-    window.ontouchend = endDrag;
-}
+    window.addEventListener('touchend', endDrag);
