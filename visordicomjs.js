@@ -62,67 +62,76 @@ function getImagePath(index) {
     return path.replace(/\/+/g, "/"); 
 }
 
-// === ALGORITMO DE CARGA PROGRESIVA ULTRA-RÁPIDA (ASÍNCRONA PRIORIZADA) ===
+// === SISTEMA DE CARGA ASÍNCRONA CORREGIDO Y SEGURO ===
 function initPrecargar() {
-    loadedCount = 0; 
+    loadedCount = 0;
     slider.max = totalFrames - 1;
-    imagesCache.length = 0; 
+    
+    // CORRECCIÓN CRÍTICA: Pre-asignamos el tamaño exacto del array
+    // Esto garantiza que la imagen 5 vaya estrictamente en la posición 5 de la caché
+    imagesCache = new Array(totalFrames); 
 
-    // 1. CARGA INMEDIATA DEL PRIMER FRAME (PRIORIDAD CRÍTICA)
-    const firstImageNumber = startParam;
+    // 1. CARGAR INMEDIATAMENTE EL PRIMER FRAME (ÍNDICE 0)
     const firstImg = new Image();
-    // Le indicamos al navegador que descargue esta imagen con máxima prioridad
-    firstImg.fetchPriority = "high"; 
-    firstImg.src = getImagePath(firstImageNumber);
-    imagesCache.push(firstImg);
+    if ('fetchPriority' in firstImg) {
+        firstImg.fetchPriority = "high"; // Prioridad de red para navegadores modernos
+    }
+    
+    // Obtenemos la ruta real usando tu función nativa para el corte inicial
+    firstImg.src = getImagePath(startParam);
+    imagesCache[0] = firstImg; // Se guarda en la posición fija 0
 
-    // Renderizado instantáneo en cuanto el primer corte esté disponible
     firstImg.onload = () => {
         loadedCount++;
-        statusText.textContent = `Estudio Inicializado (Cargando fondo: ${Math.floor((loadedCount / totalFrames) * 100)}%)`;
+        statusText.textContent = `Visor Iniciado (Cargando estudio: ${Math.floor((loadedCount / totalFrames) * 100)}%)`;
         
-        // DESBLOQUEO INMEDIATO: El usuario ya puede ver e interactuar con el visor
+        // ACTIVACIÓN INSTANTÁNEA: Desbloqueamos los controles de la web de inmediato
         slider.disabled = false;
+        
+        // Forzamos el renderizado del primer corte en pantalla
         updateFrame(0); 
+        
+        // Enlazamos los eventos del mouse/táctiles nativos de tu visor si no estaban activos
         if (typeof bindEvents === 'function') {
-            bindEvents(); 
+            bindEvents();
         }
         
-        // 2. DISPARAR LA CARGA DEL RESTO DE IMÁGENES EN SEGUNDO PLANO
-        cargarRestoDelEstudio();
+        // 2. DISPARAR EN SEGUNDO PLANO EL RESTO DE LOS CORTES DE LA TOMOGRAFÍA
+        cargarCortesSecundarios();
     };
 
     firstImg.onerror = () => {
-        console.error("Error crítico: No se pudo cargar el primer corte del estudio.");
-        statusText.textContent = "Error al inicializar estudio";
-        // Intentar de todas formas arrancar el resto por si el fallo fue aislado
-        cargarRestoDelEstudio();
+        console.error("Error al renderizar el frame inicial. Iniciando contingencia.");
+        statusText.textContent = "Error de inicialización";
+        cargarCortesSecundarios();
     };
 }
 
-// === FUNCIÓN COMPLEMENTARIA: DESCARGA PARALELA EN SEGUNDO PLANO ===
-function cargarRestoDelEstudio() {
+// === FUNCIÓN AUXILIAR: DESCARGA SILENCIOSA EN SEGUNDO PLANO ===
+function cargarCortesSecundarios() {
+    // El bucle arranca desde el índice 1 porque el 0 ya se renderizó arriba
     for (let i = 1; i < totalFrames; i++) {
         const imageNumber = startParam + i;
         const img = new Image();
         img.src = getImagePath(imageNumber);
-        imagesCache.push(img);
+        
+        // CORRECCIÓN: Colocamos el objeto imagen exactamente en su celda matemática correspondiente
+        imagesCache[i] = img; 
         
         img.onload = () => {
             loadedCount++;
-            // Actualiza el porcentaje del loader sutilmente mientras el usuario navega
             if (loadedCount < totalFrames) {
                 statusText.textContent = `Descargando cortes: ${Math.floor((loadedCount / totalFrames) * 100)}%`;
             } else {
-                statusText.textContent = "Estudio Médico Listo";
+                statusText.textContent = "Estudio Médico Completo";
             }
         };
 
         img.onerror = () => {
-            console.warn(`No se pudo localizar el corte en: ${img.src}`);
+            console.warn(`No se encontró el archivo del corte médico en: ${img.src}`);
             loadedCount++;
             if (loadedCount === totalFrames) {
-                statusText.textContent = "Estudio Médico Listo (con omisiones)";
+                statusText.textContent = "Estudio cargado (con omisiones)";
             }
         };
     }
