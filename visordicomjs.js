@@ -62,64 +62,34 @@ function getImagePath(index) {
     return path.replace(/\/+/g, "/"); 
 }
 
-// === SISTEMA DE CARGA ASÍNCRONA CORREGIDO Y SEGURO ===
+// === SISTEMA DE CARGA FLUIDO: SIN ALTERACIÓN DE ARRAY (SOLUCIÓN DEFINITIVA) ===
 function initPrecargar() {
     loadedCount = 0;
     slider.max = totalFrames - 1;
-    
-    // CORRECCIÓN CRÍTICA: Pre-asignamos el tamaño exacto del array
-    // Esto garantiza que la imagen 5 vaya estrictamente en la posición 5 de la caché
-    imagesCache = new Array(totalFrames); 
+    imagesCache = []; // Mantenemos tu inicialización nativa limpia
 
-    // 1. CARGAR INMEDIATAMENTE EL PRIMER FRAME (ÍNDICE 0)
-    const firstImg = new Image();
-    if ('fetchPriority' in firstImg) {
-        firstImg.fetchPriority = "high"; // Prioridad de red para navegadores modernos
-    }
-    
-    // Obtenemos la ruta real usando tu función nativa para el corte inicial
-    firstImg.src = getImagePath(startParam);
-    imagesCache[0] = firstImg; // Se guarda en la posición fija 0
-
-    firstImg.onload = () => {
-        loadedCount++;
-        statusText.textContent = `Visor Iniciado (Cargando estudio: ${Math.floor((loadedCount / totalFrames) * 100)}%)`;
-        
-        // ACTIVACIÓN INSTANTÁNEA: Desbloqueamos los controles de la web de inmediato
-        slider.disabled = false;
-        
-        // Forzamos el renderizado del primer corte en pantalla
-        updateFrame(0); 
-        
-        // Enlazamos los eventos del mouse/táctiles nativos de tu visor si no estaban activos
-        if (typeof bindEvents === 'function') {
-            bindEvents();
-        }
-        
-        // 2. DISPARAR EN SEGUNDO PLANO EL RESTO DE LOS CORTES DE LA TOMOGRAFÍA
-        cargarCortesSecundarios();
-    };
-
-    firstImg.onerror = () => {
-        console.error("Error al renderizar el frame inicial. Iniciando contingencia.");
-        statusText.textContent = "Error de inicialización";
-        cargarCortesSecundarios();
-    };
-}
-
-// === FUNCIÓN AUXILIAR: DESCARGA SILENCIOSA EN SEGUNDO PLANO ===
-function cargarCortesSecundarios() {
-    // El bucle arranca desde el índice 1 porque el 0 ya se renderizó arriba
-    for (let i = 1; i < totalFrames; i++) {
+    // Ciclo original idéntico para no alterar las celdas ni la estructura del array
+    for (let i = 0; i < totalFrames; i++) {
         const imageNumber = startParam + i;
         const img = new Image();
         img.src = getImagePath(imageNumber);
-        
-        // CORRECCIÓN: Colocamos el objeto imagen exactamente en su celda matemática correspondiente
-        imagesCache[i] = img; 
-        
+        imagesCache.push(img);
+
         img.onload = () => {
             loadedCount++;
+            
+            // CAMBIO CLAVE 1: Desbloqueo y renderizado inmediato en cuanto se detecte el primer frame cargado
+            // No importa qué corte termine primero, la interfaz se activa al instante para el usuario
+            if (loadedCount === 1) {
+                slider.disabled = false;
+                updateFrame(0); // Muestra inmediatamente el primer corte en pantalla
+                
+                if (typeof bindEvents === 'function') {
+                    bindEvents(); // Enlaza eventos táctiles, zoom y arrastre nativos
+                }
+            }
+
+            // CAMBIO CLAVE 2: Actualización fluida del estado en segundo plano
             if (loadedCount < totalFrames) {
                 statusText.textContent = `Descargando cortes: ${Math.floor((loadedCount / totalFrames) * 100)}%`;
             } else {
@@ -128,8 +98,15 @@ function cargarCortesSecundarios() {
         };
 
         img.onerror = () => {
-            console.warn(`No se encontró el archivo del corte médico en: ${img.src}`);
             loadedCount++;
+            console.warn(`No se pudo cargar el frame médico en: ${img.src}`);
+            
+            // Contingencia si el primer frame falla
+            if (loadedCount === 1) {
+                slider.disabled = false;
+                if (typeof bindEvents === 'function') bindEvents();
+            }
+            
             if (loadedCount === totalFrames) {
                 statusText.textContent = "Estudio cargado (con omisiones)";
             }
