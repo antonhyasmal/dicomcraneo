@@ -111,24 +111,36 @@ body {
 .tool-btn:hover svg {
     transform: scale(1.1);
 }
-/* ==========================================================================
-   CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS (ENLACE DIRECTO)
-   ========================================================================== */
+/* // CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS (CORREGIDO PARA PC) */
 
-/* Fuerza la visualización e inyecta el texto por defecto en PC */
-.btn-text {
+/* Fuerza a la etiqueta de texto a tener presencia física y espaciado en PC */
+.tool-btn .btn-text {
     display: inline-block;
-    margin-left: 6px; /* Separación estética respecto al icono SVG */
+    margin-left: 6px; /* Separa el texto del icono SVG de forma limpia */
 }
 
-/* Estado Inicial (Reposo): Lee el atributo desde su propia etiqueta span */
-.btn-text::after {
+/* Estado por defecto (Apagado / Reposo): Inyecta 'Play' o 'Zoom' */
+.tool-btn .btn-text::after {
     content: attr(data-text-off);
+    display: inline-block;
 }
 
-/* Estado Accionado (Cuando el botón padre tiene .active, cambia el texto) */
+/* Estado Accionado (Encendido / Activo): Inyecta automáticamente 'Pause' o 'Normal' */
 .tool-btn.active .btn-text::after {
     content: attr(data-text-on);
+}
+
+/* ==========================================================================
+   FILTRO PARA MÓVILES (MANTIENE LA OCULTACIÓN EN IFRAMES DE BLOGGER)
+   ========================================================================== */
+@media screen and (max-width: 540px) {
+    .tool-btn .btn-text {
+        display: none !important; /* Desaparece por completo en pantallas pequeñas */
+    }
+    .tool-btn {
+        padding: 16px 0 !important; 
+        justify-content: center !important;
+    }
 }
 /* ==========================================================================
    CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK)
