@@ -186,10 +186,10 @@ body {
 .watermark-overlay {
     position: absolute;
     /* Mantiene la posición elegida previamente (lejos de la esquina inferior derecha) */
-    bottom: 20px;                                     
+    bottom: 18px;                                     
     right: 22px;                                      
     transform: none;                       
-    font-size: 18px;                       
+    font-size: 16px;                       
     font-weight: 800;                      
     letter-spacing: 2px;
     white-space: nowrap;
@@ -202,10 +202,10 @@ body {
     /* El amarillo abarca desde el inicio hasta el 60% dando más cobertura visual, 
        luego el azul entra en el 80% y el rojo cierra de forma suave en el 100% */
     background: linear-gradient(135deg, 
-        rgba(255, 235, 59, 0.45) 0%,   /* Amarillo inicial */
+        rgba(255, 235, 59, 0.50) 0%,   /* Amarillo inicial */
         rgba(255, 235, 59, 0.45) 50%,  /* El amarillo se extiende cubriendo más espacio */
-        rgba(33, 150, 243, 0.45) 55%,  /* Azul comprimido hacia el final */
-        rgba(244, 67, 54, 0.45) 100%   /* Rojo de cierre suave */
+        rgba(33, 150, 243, 0.50) 55%,  /* Azul comprimido hacia el final */
+        rgba(244, 67, 54, 0.50) 100%   /* Rojo de cierre suave */
     );
     
     /* EFECTO DE RECORTE DE TEXTO */
