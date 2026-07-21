@@ -111,21 +111,22 @@ body {
 .tool-btn:hover svg {
     transform: scale(1.1);
 }
-/* // CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS (CORREGIDO PARA PC) */
+/* ==========================================================================
+   CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS (ENLACE DIRECTO)
+   ========================================================================== */
 
-/* Fuerza a la etiqueta de texto a tener presencia física y espaciado en PC */
-.tool-btn .btn-text {
+/* Fuerza la visualización e inyecta el texto por defecto en PC */
+.btn-text {
     display: inline-block;
-    margin-left: 6px; /* Separa el texto del icono SVG de forma limpia */
+    margin-left: 6px; /* Separación estética respecto al icono SVG */
 }
 
-/* Estado por defecto (Apagado / Reposo): Inyecta 'Play' o 'Zoom' */
-.tool-btn .btn-text::after {
+/* Estado Inicial (Reposo): Lee el atributo desde su propia etiqueta span */
+.btn-text::after {
     content: attr(data-text-off);
-    display: inline-block;
 }
 
-/* Estado Accionado (Encendido / Activo): Inyecta automáticamente 'Pause' o 'Normal' */
+/* Estado Accionado (Cuando el botón padre tiene .active, cambia el texto) */
 .tool-btn.active .btn-text::after {
     content: attr(data-text-on);
 }
