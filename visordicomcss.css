@@ -100,6 +100,17 @@ body {
     color: #ff5722;
     border-right: 1px solid rgba(255, 87, 34, 0.2) !important;
 }
+/* Asegura que el icono SVG herede el color dinámico del botón (gris en reposo, cian en hover) */
+.tool-btn svg {
+    flex-shrink: 0; /* Impide que el icono se aplaste si el texto es largo */
+    color: inherit; /* Copia el color exacto del texto del botón de forma automática */
+    transition: transform 0.2s ease;
+}
+
+/* Efecto opcional: Hace que el icono del botón seleccionado aumente sutilmente de tamaño */
+.tool-btn:hover svg {
+    transform: scale(1.1);
+}
 /* ==========================================================================
    CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK)
    ========================================================================== */
