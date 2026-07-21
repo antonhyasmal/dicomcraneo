@@ -20,16 +20,17 @@ body {
     position: relative;
 }
 
-/* CONTAINER PRINCIPAL: Adaptado milimétricamente para incrustaciones e iframes */
+/* CONTAINER PRINCIPAL: Recupera el flujo tridimensional para activar el scroll de JavaScript */
 .visor-container {
     position: sticky;
     top: 0;
-    height: 100%; /* CAMBIADO: Se adapta al alto estricto del iframe padre */
+    height: 100vh; /* CAMBIADO: Ocupa el alto dinámico de la pantalla/iframe para permitir el desplazamiento */
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0; /* CAMBIADO: Eliminamos paddings externos para erradicar los bordes negros */
+    justify-content: center; /* Centra el visor verticalmente dentro del iframe */
+    padding: 0; /* Mantenemos 0 para asegurar que no existan márgenes negros */
     background: #0a0a0a;
 }
 
