@@ -113,7 +113,9 @@ function initPrecargar() {
         };
     }
 }
-
+document.addEventListener('DOMContentLoaded', () => {
+    initPrecargar();
+});
 // === MOTOR DE ACTUALIZACIÓN DE IMÁGENES ===
 function updateFrame(index) {
     if (index < 0 || index >= totalFrames) return;
