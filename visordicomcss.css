@@ -275,3 +275,31 @@ body {
     user-select: none;                     /* Bloquea copiado accidental al arrastrar */
     -webkit-user-select: none;
 }
+/* ==========================================================================
+   MODO ICONO PURO PARA PANTALLAS ULTRA PEQUEÑAS (SMARTPHONES)
+   ========================================================================== */
+@media (max-width: 440px) {
+    /* 1. Oculta el texto por completo para liberar espacio horizontal */
+    .tool-btn span {
+        display: none !important;
+    }
+
+    /* 2. Reajusta el botón para albergar solo el icono centrado */
+    .tool-btn {
+        padding: 16px 0; /* Un poco más de altura vertical para facilitar el toque táctil */
+        justify-content: center;
+    }
+
+    /* 3. Hace que los iconos SVG crezcan y resalten mucho más */
+    .tool-btn svg {
+        width: 20px !important;  /* Incrementado de 16px a 20px */
+        height: 20px !important; /* Incrementado de 16px a 20px */
+        stroke-width: 2.0;       /* Líneas un poco más gruesas para mayor claridad médica */
+    }
+    
+    /* 4. Efecto de micro-agrandamiento al presionar con el dedo */
+    .tool-btn:active svg,
+    .tool-btn.active svg {
+        transform: scale(1.15);
+    }
+}
