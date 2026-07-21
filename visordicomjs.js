@@ -145,7 +145,7 @@ function toggleZoom() {
     if (isContrasteToolEnabled) toggleContrasteTool(); 
     isZoomed = !isZoomed;
     btnZoom.classList.toggle('active', isZoomed);
-    btnZoom.textContent = isZoomed ? "🔍 Normal" : "🔍 Zoom";
+    
     if (!isZoomed) {
         translateX = 0; translateY = 0;
         lastTranslateX = 0; lastTranslateY = 0;
@@ -171,11 +171,11 @@ function bindEvents() {
         if (isPlaying) {
             clearInterval(playInterval);
             btnPlay.classList.remove('active');
-            btnPlay.textContent = "▶ Autoplay";
+            
             isPlaying = false;
         } else {
             btnPlay.classList.add('active');
-            btnPlay.textContent = "⏸ Pausa";
+            
             isPlaying = true;
             playInterval = setInterval(() => {
                 let nextIdx = currentIdx + 1;
@@ -215,7 +215,7 @@ function bindEvents() {
         btnInvert.classList.remove('active');
         btnContraste.classList.remove('active');
         btnZoom.classList.remove('active');
-        btnZoom.textContent = "🔍 Zoom";
+        
         statusText.textContent = "Estudio Médico Listo";
         
         updateFrame(0);
