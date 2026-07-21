@@ -1,185 +1,220 @@
-/* // REINICIO DE MÁRGENES NATIVOS DE NAVEGADOR */
-/* Asegura que los tamaños de las cajas y paddings se calculen igual en Chrome, Safari y Firefox */
+/* ==========================================================================
+   REINICIO Y CONFIGURACIÓN DEL ENTORNO OSCURO MINIMALISTA
+   ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* // CONFIGURACIÓN DEL ENTORNO OSCURO CLÍNICO */
-/* Aplica el color negro de fondo reglamentario para optimizar la visualización de escalas de grises */
 body {
-    background-color: #000000; /* CAMBIADO: Negro absoluto reglamentario */
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #0a0a0a; /* CAMBIADO: Negro profundo suavizado para mitigar la fatiga ocular */
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     overflow-x: hidden;
+    letter-spacing: -0.2px;
 }
 
-/* // CONFIGURACIÓN DEL LARGO DE DESPLAZAMIENTO (SCROLL SENSIBILITY) */
-/* Multiplica el tamaño vertical de la pantalla para dar espacio físico al scroll por cortes */
 .scroll-wrapper {
     height: 350vh; 
     position: relative;
 }
 
-/* // FIJACIÓN DE LA PANTALLA CLÍNICA (STICKY CONTAINER) */
-/* Centra los componentes y genera el degradado radial de fondo que simula un negatoscopio digital */
+/* CONTAINER PRINCIPAL: Actúa como un bloque limpio flotante en pantalla */
 .visor-container {
     position: sticky;
     top: 0;
-    height: auto;              /* CAMBIADO: Ajusta la altura de forma automática al contenido */
-    width: 100%;               /* CAMBIADO: Usa el 100% del contenedor padre (el iframe) */
+    height: auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* CAMBIADO: Alinea los elementos arriba eliminando espacios vacíos */
     align-items: center;
-    padding: 0px;              /* CAMBIADO: Elimina paddings que empujan el diseño hacia adentro */
-    background: #000000;       /* CAMBIADO: Fondo negro plano idéntico a la galería */
+    padding: 40px 20px; /* Espaciado perimetral elegante para dar aire al diseño */
+    background: #0a0a0a;
 }
 
-/* // ARQUITECTURA DE LA BARRA DE HERRAMIENTAS (TOOLBAR) */
-/* Distribuye los botones superiores de forma simétrica con bordes oscuros integrados */
+/* ==========================================================================
+   BARRA DE HERRAMIENTAS (TOOLBAR) UNIFICADA MINIMALISTA
+   ========================================================================== */
 .toolbar {
     width: 100%;
-    max-width: 600px;
+    max-width: 650px;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 8px;
-    background: rgba(25, 25, 25, 0.9);
-    padding: 12px;
+    flex-wrap: nowrap; /* Mantiene la línea recta absoluta */
+    justify-content: stretch;
+    background: #0e0e0e; /* Fondo integrado sólido sin reflejos molestos */
+    padding: 0;
     border-radius: 8px 8px 0 0;
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Línea perimetral casi invisible */
     border-bottom: none;
+    overflow: hidden;
 }
 
-/* // ESTILIZADO DE BOTONES INDIVIDUALES EN REPOSO */
-/* Define las propiedades físicas de los botones mientras no se interactúa con ellos */
+/* BOTONES INTEGRADOS EN LÍNEA (SIN CAJONES) */
 .tool-btn {
-    background: #222;
-    color: #fff;
-    border: 1px solid #444;
-    padding: 8px 12px;
-    border-radius: 4px;
+    flex: 1;
+    background: transparent;
+    color: #8a99a8; /* Color tenue para no competir con el diagnóstico */
+    border: none;
+    padding: 14px 4px;
+    border-radius: 0;
     cursor: pointer;
-    font-size: 12px;
-    transition: background 0.2s, border-color 0.2s;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase; /* Estética de software de precisión */
+    letter-spacing: 0.8px;
+    text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* // EFECTO HOVER (PASAR EL PUNTERO SOBRE UN BOTÓN) */
-/* Destaca con el color cyan característico de interfaces médicas al pasar el mouse */
+/* Separadores verticales minimalistas */
+.tool-btn:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* // EFECTO HOVER MINIMALISTA CON TOQUE CIAN CLÍNICO */
+/* Genera una transición suave hacia el cian tanto en el texto como en el fondo */
 .tool-btn:hover { 
-    background: #333; 
-    border-color: #00bcd4; 
+    background: rgba(0, 188, 212, 0.08); /* Fondo cian sutil de diagnóstico */
+    color: #00bcd4;                      /* El texto y emojis cambian a cian puro */
+    border-right: 1px solid rgba(0, 188, 212, 0.1) !important; /* Ilumina sutilmente el divisor derecho */
 }
 
-/* // INTERRUPTOR DE BOTÓN EN ESTADO ACTIVO (MODO ENCENDIDO) */
-/* Cambia el color del botón cuando la herramienta respectiva (Play, Zoom, etc.) está en ejecución */
+/* Botón Activo: Cambia el texto al cyan clínico nativo y agrega un indicador plano */
 .tool-btn.active { 
-    background: #00bcd4; 
-    color: #000; 
-    border-color: #00bcd4; 
-    font-weight: bold; 
+    background: rgba(0, 188, 212, 0.04);
+    color: #00bcd4; 
+    font-weight: 600;
 }
 
-/* // ALERTA VISUAL PARA EL BOTÓN DE RESTABLECIMIENTO (RESET HOVER) */
-/* Cambia el borde a naranja sutil para advertir la limpieza completa de filtros aplicados */
+/* // ALERTA VISUAL ADAPTADA PARA EL BOTÓN DE RESTABLECIMIENTO (RESET HOVER) */
+/* El botón reset mantiene su código de color naranja de advertencia en su hover */
 #btnReset:hover {
-    border-color: #ff5722;
+    background: rgba(255, 87, 34, 0.08);
     color: #ff5722;
+    border-right: 1px solid rgba(255, 87, 34, 0.2) !important;
 }
-
-/* // CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK) */
+/* ==========================================================================
+   CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK)
+   ========================================================================== */
 .frame-wrapper {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: 650px;
     aspect-ratio: 1 / 1;
-    background: #000;
-    border: 1px solid #333;
+    background: #000000; /* Negro absoluto de fondo exclusivo para calibrar grises */
+    border: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden; 
     display: flex;
     justify-content: center;
     align-items: center;
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    
-    /* SOLUCIÓN AL SCROLL MÓVIL: Bloquea los gestos del navegador sobre este contenedor */
     touch-action: none; 
 }
 
-/* // RENDERIZADO OPTIMIZADO POR HARDWARE DE LA IMAGEN MÉDICA */
-/* Configura el comportamiento elástico del JPG y acelera las transiciones de brillo con la GPU */
 .frame-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: filter 0.05s ease;
+    transition: filter 0.04s ease;
     transform-origin: center center;
-    cursor: default; 
-    z-index: 1;
-    user-select: none;
-    -webkit-user-drag: none;
-    -webkit-user-select: none;
 }
 
-/* // PANEL DE CONTROL E INFORMACIÓN INFERIOR (FOOTER PANEL) */
-/* Unifica la estética del contenedor inferior acoplándolo simétricamente a la caja del visor */
+/* ==========================================================================
+   PANEL DE CONTROL INFERIOR (FOOTER PANEL)
+   ========================================================================== */
 .controls-panel {
     width: 100%;
-    max-width: 600px;
+    max-width: 650px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    background: rgba(25, 25, 25, 0.9);
-    padding: 16px;
+    gap: 16px;
+    background: #0e0e0e;
+    padding: 20px;
     border-radius: 0 0 8px 8px;
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: none;
 }
 
-/* // ORGANIZACIÓN DE METADATOS TÉCNICOS (INFO ROW) */
-/* Fuerza a que los números de cortes usen un ancho fijo monoespaciado para que no "bailen" al cambiar */
+/* METADATOS TÉCNICOS */
 .info-row {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
-    color: #aaa;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #667684;
+}
+
+/* Distintivo de cortes transformado en texto plano elegante */
+.status-badge { 
+    background: transparent; 
+    padding: 0; 
+    color: #00bcd4; 
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+/* ID del Loader / Estado */
+#loaderStatus {
     font-variant-numeric: tabular-nums;
 }
 
-/* // DISTINTIVO NUMÉRICO DE CORTE (STATUS BADGE) */
-.status-badge { background: #111; padding: 2px 8px; border-radius: 4px; color: #00bcd4; }
-
-/* // ESTILIZADO DE LA PISTA DE LA BARRA DESLIZANTE (SLIDER TRACK) */
+/* ==========================================================================
+   BARRA DESLIZANTE (SLIDER TRACK) ULTRA-MINIMALISTA
+   ========================================================================== */
 .slider-control {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: #444;
+    height: 3px; /* CAMBIADO: Línea de deslizamiento ultra delgada */
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
     outline: none;
+    transition: background 0.3s;
 }
 
-/* // BOTÓN DESLIZANTE REDONDO PARA INTERFACES WEBKIT (CHROME / SAFARI) */
+.slider-control:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* BOTÓN DESLIZANTE (THUMB): Reducido de tamaño para diseño de aguja de precisión */
 .slider-control::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #00bcd4; cursor: pointer;
+    -webkit-appearance: none; 
+    appearance: none; 
+    width: 12px; /* Reducido de 22px a 12px */
+    height: 12px; 
+    border-radius: 50%; 
+    background: #00bcd4; 
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.slider-control::-webkit-slider-thumb:hover {
+    transform: scale(1.3); /* Crece sutilmente al poner el cursor encima */
 }
 
-/* // BOTÓN DESLIZANTE REDONDO PARA INTERFACES GECKO (FIREFOX) */
 .slider-control::-moz-range-thumb {
-    width: 22px; height: 22px; border: none; border-radius: 50%; background: #00bcd4; cursor: pointer;
+    width: 12px; 
+    height: 12px; 
+    border: none; 
+    border-radius: 50%; 
+    background: #00bcd4; 
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.slider-control::-moz-range-thumb:hover {
+    transform: scale(1.3);
 }
 
-/* // ADAPTACIÓN DE INTERFAZ PARA DISPOSITIVOS MÓVILES EN HORIZONTAL */
-/* Rota los paneles a los costados si la pantalla del celular mide menos de 600px de alto */
+/* ADAPTACIÓN MÓVILES */
 @media (max-height: 600px) and (orientation: landscape) {
-    .visor-container { flex-direction: row; flex-wrap: wrap; height: auto; min-height: 100vh; }
+    .visor-container { padding: 10px; flex-direction: row; flex-wrap: wrap; }
     .toolbar, .frame-wrapper, .controls-panel { max-width: 450px; }
 }
 /* // CAPA SUPERPUESTA DE MARCA DE AGUA (DISEÑO IDÉNTICO EN PC Y MÓVIL) */
