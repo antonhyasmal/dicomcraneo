@@ -275,34 +275,41 @@ body {
     user-select: none;                     /* Bloquea copiado accidental al arrastrar */
     -webkit-user-select: none;
 }
+
 /* ==========================================================================
-   MODO ICONO PURO INTELIGENTE (OPTIMIZADO PARA IFRAMES EN MÓVILES)
-   Utiliza unidades de vista de contenedor (cqw/vw) y flex-direction para colapsar
+   DISEÑO BASE PARA COMPU / PANTALLAS GRANDES (MUESTRA TEXTO + ICONO)
    ========================================================================== */
-
-/* 1. Oculta el texto de forma elástica si el espacio horizontal es crítico */
 .tool-btn span {
-    display: none !important;
+    display: inline-block; /* Asegura que el texto sea visible en PC */
 }
 
-/* 2. Reajusta el botón para centrar perfectamente el icono de forma táctil */
-.tool-btn {
-    padding: 16px 0 !important; /* Más altura vertical para facilitar el toque del dedo */
-    justify-content: center !important;
-    min-width: 0; /* Evita que el botón retenga el ancho del texto oculto */
-}
-
-/* 3. Agranda los iconos SVG y engrosa sus líneas para máxima nitidez médica */
 .tool-btn svg {
-    width: 22px !important;   /* Incrementado para resaltar en el cristal del celular */
-    height: 22px !important;
-    stroke-width: 2.2 !important; /* Trazos más gruesos y definidos */
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 16px;  /* Tamaño estilizado estándar para escritorio */
+    height: 16px;
+    stroke-width: 1.8;
 }
 
-/* 4. Feedback táctil de precisión al pulsar el icono en pantallas móviles */
-.tool-btn:active svg,
-.tool-btn.active svg {
-    transform: scale(1.18);
-    color: #00bcd4;
+/* ==========================================================================
+   FILTRO PARA MÓVILES (ACTIVA SOLO ICONOS CUANDO EL IFRAME SE ENCOGE)
+   Calibrado a 540px para capturar con precisión el tamaño del iframe en celulares
+   ========================================================================== */
+@media screen and (max-width: 540px) {
+    /* 1. Oculta el texto de forma radical solo dentro del entorno móvil */
+    .tool-btn span {
+        display: none !important;
+    }
+
+    /* 2. Centra los iconos de forma táctil en el espacio liberado */
+    .tool-btn {
+        padding: 16px 0 !important; 
+        justify-content: center !important;
+        min-width: 0 !important;
+    }
+
+    /* 3. Agranda los iconos para que resalten al tacto en pantallas de celular */
+    .tool-btn svg {
+        width: 22px !important;   
+        height: 22px !important;
+        stroke-width: 2.2 !important; /* Trazos más definidos para diagnóstico móvil */
+    }
 }
