@@ -111,24 +111,23 @@ body {
 .tool-btn:hover svg {
     transform: scale(1.1);
 }
-/* // CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS */
+/* // CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS (CORREGIDO PARA PC) */
 
-/* Estado por defecto (Apagado / Reposo): Muestra 'Play' o 'Zoom' */
+/* Fuerza a la etiqueta de texto a tener presencia física y espaciado en PC */
+.tool-btn .btn-text {
+    display: inline-block;
+    margin-left: 6px; /* Separa el texto del icono SVG de forma limpia */
+}
+
+/* Estado por defecto (Apagado / Reposo): Inyecta 'Play' o 'Zoom' */
 .tool-btn .btn-text::after {
-    content: parent-attr(data-text-off) !important; /* Compatibilidad moderna */
-    content: attr(data-text-off); 
+    content: attr(data-text-off);
+    display: inline-block;
 }
 
-/* Estado Accionado (Encendido / Activo): Cambia automáticamente a 'Pause' o 'Normal' */
+/* Estado Accionado (Encendido / Activo): Inyecta automáticamente 'Pause' o 'Normal' */
 .tool-btn.active .btn-text::after {
-    content: attr(data-text-on) !important;
-}
-
-/* Ocultamiento estricto en pantallas de celular (mantiene la regla que creamos para móviles) */
-@media screen and (max-width: 540px) {
-    .tool-btn .btn-text {
-        display: none !important;
-    }
+    content: attr(data-text-on);
 }
 /* ==========================================================================
    CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK)
