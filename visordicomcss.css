@@ -186,10 +186,10 @@ body {
 .watermark-overlay {
     position: absolute;
     /* Mantiene la posición elegida previamente (lejos de la esquina inferior derecha) */
-    bottom: 24px;                                     
-    right: 24px;                                      
+    bottom: 20px;                                     
+    right: 22px;                                      
     transform: none;                       
-    font-size: 20px;                       
+    font-size: 18px;                       
     font-weight: 800;                      
     letter-spacing: 2px;
     white-space: nowrap;
