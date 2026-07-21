@@ -321,3 +321,21 @@ function bindEvents() {
 
     window.addEventListener('touchend', endDrag);
 }
+// CONTROLADOR DE RUEDA DE MOUSE DIRECTO (SIN SCROLL DE PÁGINA)
+const frameContainer = document.querySelector('.frame-wrapper');
+
+if (frameContainer) {
+    frameContainer.addEventListener('wheel', function(e) {
+        // Previene de forma radical que la página de Blogger se mueva
+        e.preventDefault(); 
+
+        // Detecta la dirección de la rueda (hacia arriba o hacia abajo)
+        if (e.deltaY > 0) {
+            // AQUÍ LLAMA A TU FUNCIÓN ACTUAL PARA AVANZAR IMAGEN
+            // Ejemplo: mostrarSiguienteImagen(); o cambiarCorte(1);
+        } else {
+            // AQUÍ LLAMA A TU FUNCIÓN ACTUAL PARA RETROCEDER IMAGEN
+            // Ejemplo: mostrarImagenAnterior(); o cambiarCorte(-1);
+        }
+    }, { passive: false }); // 'passive: false' es obligatorio para que e.preventDefault() funcione
+}
