@@ -20,16 +20,16 @@ body {
     position: relative;
 }
 
-/* CONTAINER PRINCIPAL: Actúa como un bloque limpio flotante en pantalla */
+/* CONTAINER PRINCIPAL: Adaptado milimétricamente para incrustaciones e iframes */
 .visor-container {
     position: sticky;
     top: 0;
-    height: auto;
+    height: 100%; /* CAMBIADO: Se adapta al alto estricto del iframe padre */
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px; /* Espaciado perimetral elegante para dar aire al diseño */
+    padding: 0; /* CAMBIADO: Eliminamos paddings externos para erradicar los bordes negros */
     background: #0a0a0a;
 }
 
