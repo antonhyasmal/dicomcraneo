@@ -182,30 +182,38 @@ body {
     .visor-container { flex-direction: row; flex-wrap: wrap; height: auto; min-height: 100vh; }
     .toolbar, .frame-wrapper, .controls-panel { max-width: 450px; }
 }
-/* // CAPA SUPERPUESTA DE MARCA DE AGUA (CURSIVA - PREDOMINIO AMARILLO) */
+/* // CAPA SUPERPUESTA DE MARCA DE AGUA (DISEÑO IDÉNTICO EN PC Y MÓVIL) */
 .watermark-overlay {
     position: absolute;
-    /* Mantiene la posición elegida previamente (lejos de la esquina inferior derecha) */
-    bottom: 18px;                                     
-    right: 22px;                                      
+    /* Ubicación fija con margen proporcional (escalable en pantallas chicas) */
+    bottom: min(24px, 4%);                                     
+    right: min(24px, 4%);                                      
     transform: none;                       
-    font-size: 16px;                       
-    font-weight: 800;                      
-    letter-spacing: 2px;
-    white-space: nowrap;
     z-index: 10;
     
-    /* CAMBIADO: Se añade estilo cursiva / inclinado */
-    font-style: italic;
+    /* BLOQUEO DE ERRORES MÓVILES (Fuerza la misma fuente en PC, Android e iOS) */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-style: italic;                    /* Mantiene estilo cursiva */
+    font-weight: 800;                      
+    text-transform: none;                  /* Respeta mayúsculas y minúsculas ingresadas */
+    white-space: nowrap;
     
-    /* CAMBIADO: Configuración del degradado diagonal con predominio amarillo */
-    /* El amarillo abarca desde el inicio hasta el 60% dando más cobertura visual, 
-       luego el azul entra en el 80% y el rojo cierra de forma suave en el 100% */
+    /* TIPOGRAFÍA FLUIDA Y CONTROLADA */
+    /* clamp(Mínimo, Cálculo Dinámico según contenedor, Máximo) */
+    font-size: clamp(12px, 1.5vw + 8px, 18px); 
+    letter-spacing: clamp(1px, 0.2vw, 2px);    /* Evita que las letras se amontonen en celulares */
+
+    /* PROTECCIÓN DE RENDERIZADO MÓVIL */
+    -webkit-text-size-adjust: 100%;        /* Evita que los iPhones alteren el tamaño diseñado */
+    text-rendering: optimizeLegibility;     /* Asegura bordes limpios en las letras */
+    -webkit-font-smoothing: antialiased;   /* Suaviza los pixeles en pantallas Retina/OLED */
+    
+    /* DEGRADADO DIAGONAL CON PREDOMINIO AMARILLO (SUTRE SOBRE TC DE NEGRO ABSOLUTO) */
     background: linear-gradient(135deg, 
-        rgba(255, 235, 59, 0.50) 0%,   /* Amarillo inicial */
-        rgba(255, 235, 59, 0.45) 50%,  /* El amarillo se extiende cubriendo más espacio */
-        rgba(33, 150, 243, 0.50) 55%,  /* Azul comprimido hacia el final */
-        rgba(244, 67, 54, 0.50) 100%   /* Rojo de cierre suave */
+        rgba(255, 235, 59, 0.45) 0%,   
+        rgba(255, 235, 59, 0.45) 50%,  /* El amarillo abarca el 60% del texto */
+        rgba(33, 150, 243, 0.45) 60%,  
+        rgba(244, 67, 54, 0.45) 95%   
     );
     
     /* EFECTO DE RECORTE DE TEXTO */
@@ -213,8 +221,8 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent; 
     
-    /* SEGURIDAD DE INTERFAZ DICOM */
-    pointer-events: none;                  
-    user-select: none;                    
+    /* INTERACCIONES TÁCTILES SIN BLOQUEOS */
+    pointer-events: none;                  /* Gestos táctiles atraviesan la capa */
+    user-select: none;                     /* Bloquea copiado accidental al arrastrar */
     -webkit-user-select: none;
 }
