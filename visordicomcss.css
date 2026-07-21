@@ -111,6 +111,25 @@ body {
 .tool-btn:hover svg {
     transform: scale(1.1);
 }
+/* // CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS */
+
+/* Estado por defecto (Apagado / Reposo): Muestra 'Play' o 'Zoom' */
+.tool-btn .btn-text::after {
+    content: parent-attr(data-text-off) !important; /* Compatibilidad moderna */
+    content: attr(data-text-off); 
+}
+
+/* Estado Accionado (Encendido / Activo): Cambia automáticamente a 'Pause' o 'Normal' */
+.tool-btn.active .btn-text::after {
+    content: attr(data-text-on) !important;
+}
+
+/* Ocultamiento estricto en pantallas de celular (mantiene la regla que creamos para móviles) */
+@media screen and (max-width: 540px) {
+    .tool-btn .btn-text {
+        display: none !important;
+    }
+}
 /* ==========================================================================
    CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK)
    ========================================================================== */
