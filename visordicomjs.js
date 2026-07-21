@@ -62,60 +62,52 @@ function getImagePath(index) {
     return path.replace(/\/+/g, "/"); 
 }
 
-// === SISTEMA DE CARGA FLUIDO: SIN ALTERACIÓN DE ARRAY (SOLUCIÓN DEFINITIVA) ===
+// === ALGORITMO DE DESCARGA PREVENTIVA / PRECARGA ===
 function initPrecargar() {
-    loadedCount = 0;
+    loadedCount = 0; 
     slider.max = totalFrames - 1;
-    imagesCache = []; // Mantenemos tu inicialización nativa limpia
+    imagesCache.length = 0; 
 
-    // Ciclo original idéntico para no alterar las celdas ni la estructura del array
     for (let i = 0; i < totalFrames; i++) {
-        const imageNumber = startParam + i;
+        const imageNumber = startParam + i; 
+        
         const img = new Image();
         img.src = getImagePath(imageNumber);
         imagesCache.push(img);
-
+        
         img.onload = () => {
             loadedCount++;
+            statusText.textContent = `Descargando: ${Math.floor((loadedCount / totalFrames) * 100)}%`;
             
-            // CAMBIO CLAVE 1: Desbloqueo y renderizado inmediato en cuanto se detecte el primer frame cargado
-            // No importa qué corte termine primero, la interfaz se activa al instante para el usuario
-            if (loadedCount === 1) {
+            if (loadedCount === totalFrames) {
+                statusText.textContent = "Estudio Médico Listo";
                 slider.disabled = false;
-                updateFrame(0); // Muestra inmediatamente el primer corte en pantalla
-                
+                updateFrame(0); 
                 if (typeof bindEvents === 'function') {
-                    bindEvents(); // Enlaza eventos táctiles, zoom y arrastre nativos
+                    bindEvents(); 
                 }
-            }
-
-            // CAMBIO CLAVE 2: Actualización fluida del estado en segundo plano
-            if (loadedCount < totalFrames) {
-                statusText.textContent = `Descargando cortes: ${Math.floor((loadedCount / totalFrames) * 100)}%`;
-            } else {
-                statusText.textContent = "Estudio Médico Completo";
             }
         };
 
         img.onerror = () => {
+            console.warn(`No se pudo localizar la imagen en: ${img.src}`);
             loadedCount++;
-            console.warn(`No se pudo cargar el frame médico en: ${img.src}`);
-            
-            // Contingencia si el primer frame falla
-            if (loadedCount === 1) {
-                slider.disabled = false;
-                if (typeof bindEvents === 'function') bindEvents();
-            }
-            
             if (loadedCount === totalFrames) {
-                statusText.textContent = "Estudio cargado (con omisiones)";
+                statusText.textContent = "Estudio Médico Listo (con omisiones)";
+                slider.disabled = false;
+                updateFrame(0);
+                if (typeof bindEvents === 'function') {
+                    bindEvents();
+                }
             }
         };
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     initPrecargar();
 });
+
 // === MOTOR DE ACTUALIZACIÓN DE IMÁGENES ===
 function updateFrame(index) {
     if (index < 0 || index >= totalFrames) return;
