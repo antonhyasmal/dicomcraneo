@@ -15,22 +15,23 @@ body {
     letter-spacing: -0.2px;
 }
 
+/* // REINICIO DE ARQUITECTURA DE ALTURA STICKY A FIJA */
 .scroll-wrapper {
-    height: 350vh; 
+    height: 100vh; /* CAMBIADO: Eliminamos los 350vh. El contenedor ya no crece infinitamente */
     position: relative;
+    overflow: hidden; /* Evita que el iframe intente pintar barras de scroll */
 }
-
 /* CONTAINER PRINCIPAL: Recupera el flujo tridimensional para activar el scroll de JavaScript */
 .visor-container {
-    position: sticky;
+    position: relative; /* CAMBIADO: De 'sticky' a 'relative' */
     top: 0;
-    height: 100vh; /* CAMBIADO: Ocupa el alto dinámico de la pantalla/iframe para permitir el desplazamiento */
+    height: 100vh; 
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Centra el visor verticalmente dentro del iframe */
-    padding: 0; /* Mantenemos 0 para asegurar que no existan márgenes negros */
+    justify-content: center;
+    padding: 0; 
     background: #0a0a0a;
 }
 
@@ -107,16 +108,17 @@ body {
     width: 100%;
     max-width: 650px;
     aspect-ratio: 1 / 1;
-    background: #000000; /* Negro absoluto de fondo exclusivo para calibrar grises */
+    background: #000000;
     border: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden; 
     display: flex;
     justify-content: center;
     align-items: center;
     user-select: none;
+    
+    /* PROPIEDAD CLAVE: Bloquea los gestos nativos del navegador móvil en esta área */
     touch-action: none; 
 }
-
 .frame-wrapper img {
     width: 100%;
     height: 100%;
