@@ -1,6 +1,6 @@
 /**
  * Visor DICOM Profesional Completo para Blogger
- * Versión Dinámica con Parámetros de URL - Integrado con Motor Visual
+ * Versión Dinámica Optimizada
  */
 
 // === 1. CAPTURA DE VARIABLES INTERNAS DEL ÁRBOL DOM ===
@@ -19,14 +19,14 @@ const btnReset = document.getElementById('btnReset');
 // === LECTOR DE PARÁMETROS DINÁMICOS DESDE LA URL ===
 const urlParams = new URLSearchParams(window.location.search);
 
-let folderParam = urlParams.get('album') ? urlParams.get('album') : 'img';
+let folderParam = urlParams.get('album') || 'img';
 if (!folderParam.endsWith('/')) {
     folderParam += '/';
 }
 const totalFrames = parseInt(urlParams.get('cortes')) || 60; 
-const prefixParam = urlParams.get('prefix') ? urlParams.get('prefix') : 'corte_';
+const prefixParam = urlParams.get('prefix') || 'corte_';
 const startParam = urlParams.get('start') !== null ? parseInt(urlParams.get('start')) : 1;
-const extParam = urlParams.get('ext') ? urlParams.get('ext') : 'jpg';
+const extParam = urlParams.get('ext') || 'jpg';
 
 // === VARIABLES DE ADQUISICIÓN Y CONTROL DEL ESTUDIO ===
 const imagesCache = []; 
@@ -58,8 +58,7 @@ let lastTranslateX = 0, lastTranslateY = 0;
 
 // === CONSTRUCTOR DINÁMICO DE RUTAS DE ARCHIVOS ===
 function getImagePath(index) {
-    let path = `${folderParam}${prefixParam}${index}.${extParam}`;
-    return path.replace(/\/+/g, "/"); 
+    return `${folderParam}${prefixParam}${index}.${extParam}`.replace(/\/+/g, "/"); 
 }
 
 // === ALGORITMO DE DESCARGA PREVENTIVA / PRECARGA ===
@@ -70,7 +69,6 @@ function initPrecargar() {
 
     for (let i = 0; i < totalFrames; i++) {
         const imageNumber = startParam + i; 
-        
         const img = new Image();
         img.src = getImagePath(imageNumber);
         imagesCache.push(img);
@@ -78,35 +76,25 @@ function initPrecargar() {
         img.onload = () => {
             loadedCount++;
             statusText.textContent = `Descargando: ${Math.floor((loadedCount / totalFrames) * 100)}%`;
-            
-            if (loadedCount === totalFrames) {
-                statusText.textContent = "Estudio Médico Listo";
-                slider.disabled = false;
-                updateFrame(0); 
-                if (typeof bindEvents === 'function') {
-                    bindEvents(); 
-                }
-            }
+            if (loadedCount === totalFrames) finalizarPrecarga("Estudio Médico Listo");
         };
 
         img.onerror = () => {
             console.warn(`No se pudo localizar la imagen en: ${img.src}`);
             loadedCount++;
-            if (loadedCount === totalFrames) {
-                statusText.textContent = "Estudio Médico Listo (con omisiones)";
-                slider.disabled = false;
-                updateFrame(0);
-                if (typeof bindEvents === 'function') {
-                    bindEvents();
-                }
-            }
+            if (loadedCount === totalFrames) finalizarPrecarga("Estudio Médico Listo (con omisiones)");
         };
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    initPrecargar();
-});
+function finalizarPrecarga(mensaje) {
+    statusText.textContent = mensaje;
+    slider.disabled = false;
+    updateFrame(0); 
+    bindEvents(); 
+}
+
+document.addEventListener('DOMContentLoaded', initPrecargar);
 
 // === MOTOR DE ACTUALIZACIÓN DE IMÁGENES ===
 function updateFrame(index) {
@@ -132,12 +120,9 @@ function aplicarEstilosVisuales() {
     if (isZoomed) {
         imgElement.style.transform = `scale(2.2) translate(${translateX / 2.2}px, ${translateY / 2.2}px)`;
         imgElement.style.cursor = isDragging ? 'grabbing' : 'grab';
-    } else if (isContrasteToolEnabled) {
-        imgElement.style.transform = 'scale(1) translate(0px, 0px)';
-        imgElement.style.cursor = 'move'; 
     } else {
         imgElement.style.transform = 'scale(1) translate(0px, 0px)';
-        imgElement.style.cursor = 'default'; 
+        imgElement.style.cursor = isContrasteToolEnabled ? 'move' : 'default'; 
     }
 }
 
@@ -171,21 +156,14 @@ function bindEvents() {
         if (isPlaying) {
             clearInterval(playInterval);
             btnPlay.classList.remove('active');
-            
             isPlaying = false;
         } else {
             btnPlay.classList.add('active');
-            
             isPlaying = true;
             playInterval = setInterval(() => {
                 let nextIdx = currentIdx + 1;
                 if (nextIdx >= totalFrames) nextIdx = 0; 
                 updateFrame(nextIdx);
-                
-                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                if (maxScroll > 0) {
-                    window.scrollTo(0, (nextIdx / (totalFrames - 1)) * maxScroll);
-                }
             }, playSpeed);
         }
     };
@@ -200,24 +178,19 @@ function bindEvents() {
     btnZoom.onclick = toggleZoom;
 
     btnReset.onclick = () => {
-        if (isPlaying) btnPlay.click();
+        if (isPlaying) clearInterval(playInterval);
+        isPlaying = false;
         filterInvert = false;
-        brightnessLevel = 100;
-        contrastLevel = 100;
-        baseBrightness = 100;
-        baseContrast = 100;
-        isContrasteToolEnabled = false;
-        isPressedToAdjust = false;
-        isZoomed = false;
-        translateX = 0; translateY = 0;
-        lastTranslateX = 0; lastTranslateY = 0;
+        brightnessLevel = 100; contrastLevel = 100;
+        baseBrightness = 100; baseContrast = 100;
+        isContrasteToolEnabled = false; isPressedToAdjust = false; isZoomed = false;
+        translateX = 0; translateY = 0; lastTranslateX = 0; lastTranslateY = 0;
         
+        btnPlay.classList.remove('active');
         btnInvert.classList.remove('active');
         btnContraste.classList.remove('active');
         btnZoom.classList.remove('active');
-        
         statusText.textContent = "Estudio Médico Listo";
-        
         updateFrame(0);
     };
 
@@ -227,22 +200,15 @@ function bindEvents() {
         let targetIdx = currentIdx + (e.deltaY > 0 ? 1 : -1);
         if (targetIdx >= 0 && targetIdx < totalFrames) {
             updateFrame(targetIdx);
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            if (maxScroll > 0) {
-                window.scrollTo(0, (targetIdx / (totalFrames - 1)) * maxScroll);
-            }
         }
     };
 
-    // Variables adicionales para el control de frames táctil
-    let startFrameY = 0;
-    let startFrameIdx = 0;
+    let startFrameY = 0, startFrameIdx = 0;
 
     const startDrag = (clientX, clientY) => {
         if (isPlaying) btnPlay.click();
         isDragging = true;
-        startX = clientX;
-        startY = clientY;
+        startX = clientX; startY = clientY;
 
         if (isContrasteToolEnabled) {
             isPressedToAdjust = true;
@@ -267,10 +233,8 @@ function bindEvents() {
             statusText.textContent = `Brillo: ${Math.round(brightnessLevel)}% | Contraste: ${Math.round(contrastLevel)}%`;
             aplicarEstilosVisuales();
         } else {
-            let diffY = clientY - startFrameY;
-            let frameOffset = Math.floor(diffY / 8); 
+            let frameOffset = Math.floor((clientY - startFrameY) / 8); 
             let targetIdx = startFrameIdx + frameOffset;
-            
             if (targetIdx >= 0 && targetIdx < totalFrames && targetIdx !== currentIdx) {
                 updateFrame(targetIdx);
             }
@@ -297,7 +261,6 @@ function bindEvents() {
 
     wrapper.oncontextmenu = (e) => e.preventDefault();
 
-    // Capturas para Mouse de Escritorio
     imgElement.onmousedown = (e) => {
         e.preventDefault(); 
         if (e.button === 0) startDrag(e.clientX, e.clientY);
@@ -305,7 +268,6 @@ function bindEvents() {
     window.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
     window.onmouseup = endDrag;
 
-    // === CAPTURAS TÁCTILES MÓVILES SINTAXIS REPARADA ===
     imgElement.addEventListener('touchstart', (e) => {
         if (e.touches && e.touches.length === 1) {
             startDrag(e.touches[0].clientX, e.touches[0].clientY);
@@ -314,28 +276,10 @@ function bindEvents() {
 
     window.addEventListener('touchmove', (e) => {
         if (isDragging && e.touches && e.touches.length === 1) {
-            e.preventDefault(); // Bloquea el scroll de la web con éxito
+            e.preventDefault(); 
             moveDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
-    }, { passive: false }); // SINTAXIS CORREGIDA: Se eliminó la coma errónea anterior
+    }, { passive: false });
 
     window.addEventListener('touchend', endDrag);
-}
-// CONTROLADOR DE RUEDA DE MOUSE DIRECTO (SIN SCROLL DE PÁGINA)
-const frameContainer = document.querySelector('.frame-wrapper');
-
-if (frameContainer) {
-    frameContainer.addEventListener('wheel', function(e) {
-        // Previene de forma radical que la página de Blogger se mueva
-        e.preventDefault(); 
-
-        // Detecta la dirección de la rueda (hacia arriba o hacia abajo)
-        if (e.deltaY > 0) {
-            // AQUÍ LLAMA A TU FUNCIÓN ACTUAL PARA AVANZAR IMAGEN
-            // Ejemplo: mostrarSiguienteImagen(); o cambiarCorte(1);
-        } else {
-            // AQUÍ LLAMA A TU FUNCIÓN ACTUAL PARA RETROCEDER IMAGEN
-            // Ejemplo: mostrarImagenAnterior(); o cambiarCorte(-1);
-        }
-    }, { passive: false }); // 'passive: false' es obligatorio para que e.preventDefault() funcione
 }
