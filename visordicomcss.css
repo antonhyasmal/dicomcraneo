@@ -8,22 +8,21 @@
 }
 
 body {
-    background-color: #0a0a0a; /* CAMBIADO: Negro profundo suavizado para mitigar la fatiga ocular */
+    background-color: #0a0a0a;
     color: #e2e8f0;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     overflow-x: hidden;
     letter-spacing: -0.2px;
 }
 
-/* // REINICIO DE ARQUITECTURA DE ALTURA STICKY A FIJA */
 .scroll-wrapper {
-    height: 100vh; /* CAMBIADO: Eliminamos los 350vh. El contenedor ya no crece infinitamente */
+    height: 100vh;
     position: relative;
-    overflow: hidden; /* Evita que el iframe intente pintar barras de scroll */
+    overflow: hidden;
 }
-/* CONTAINER PRINCIPAL: Recupera el flujo tridimensional para activar el scroll de JavaScript */
+
 .visor-container {
-    position: relative; /* CAMBIADO: De 'sticky' a 'relative' */
+    position: relative;
     top: 0;
     height: 100vh; 
     width: 100%;
@@ -42,30 +41,27 @@ body {
     width: 100%;
     max-width: 650px;
     display: flex;
-    flex-wrap: nowrap; /* Mantiene la línea recta absoluta */
+    flex-wrap: nowrap;
     justify-content: stretch;
-    background: #0e0e0e; /* Fondo integrado sólido sin reflejos molestos */
+    background: #0e0e0e;
     padding: 0;
     border-radius: 8px 8px 0 0;
-    border: 1px solid rgba(255, 255, 255, 0.05); /* Línea perimetral casi invisible */
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-bottom: none;
     overflow: hidden;
 }
 
-/* BOTONES INTEGRADOS EN LÍNEA (SIN CAJONES) */
 .tool-btn {
     flex: 1;
     background: transparent;
-    color: #8a99a8; /* Color tenue para no competir con el diagnóstico */
+    color: #8a99a8;
     border: none;
     padding: 14px 4px;
-    border-radius: 0;
     cursor: pointer;
     font-size: 11px;
     font-weight: 500;
-    text-transform: uppercase; /* Estética de software de precisión */
+    text-transform: uppercase;
     letter-spacing: 0.8px;
-    text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,78 +69,59 @@ body {
     transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Separadores verticales minimalistas */
 .tool-btn:not(:last-child) {
     border-right: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* // EFECTO HOVER MINIMALISTA CON TOQUE CIAN CLÍNICO */
-/* Genera una transición suave hacia el cian tanto en el texto como en el fondo */
 .tool-btn:hover { 
-    background: rgba(0, 188, 212, 0.08); /* Fondo cian sutil de diagnóstico */
-    color: #00bcd4;                      /* El texto y emojis cambian a cian puro */
-    border-right: 1px solid rgba(0, 188, 212, 0.1) !important; /* Ilumina sutilmente el divisor derecho */
+    background: rgba(0, 188, 212, 0.08);
+    color: #00bcd4;
+    border-right: 1px solid rgba(0, 188, 212, 0.1) !important;
 }
 
-/* Botón Activo: Cambia el texto al cyan clínico nativo y agrega un indicador plano */
 .tool-btn.active { 
     background: rgba(0, 188, 212, 0.04);
     color: #00bcd4; 
     font-weight: 600;
 }
 
-/* // ALERTA VISUAL ADAPTADA PARA EL BOTÓN DE RESTABLECIMIENTO (RESET HOVER) */
-/* El botón reset mantiene su código de color naranja de advertencia en su hover */
 #btnReset:hover {
     background: rgba(255, 87, 34, 0.08);
     color: #ff5722;
     border-right: 1px solid rgba(255, 87, 34, 0.2) !important;
 }
-/* Asegura que el icono SVG herede el color dinámico del botón (gris en reposo, cian en hover) */
+
 .tool-btn svg {
-    flex-shrink: 0; /* Impide que el icono se aplaste si el texto es largo */
-    color: inherit; /* Copia el color exacto del texto del botón de forma automática */
+    flex-shrink: 0;
+    color: inherit;
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.8;
     transition: transform 0.2s ease;
 }
 
-/* Efecto opcional: Hace que el icono del botón seleccionado aumente sutilmente de tamaño */
 .tool-btn:hover svg {
     transform: scale(1.1);
 }
-/* ==========================================================================
-   CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS (ENLACE DIRECTO)
-   ========================================================================== */
 
-/* Fuerza la visualización e inyecta el texto por defecto en PC */
+/* ==========================================================================
+   CONTROL DE TEXTO DINÁMICO ASISTIDO POR CSS
+   ========================================================================== */
 .btn-text {
     display: inline-block;
-    margin-left: 6px; /* Separación estética respecto al icono SVG */
+    margin-left: 6px;
 }
 
-/* Estado Inicial (Reposo): Lee el atributo desde su propia etiqueta span */
 .btn-text::after {
     content: attr(data-text-off);
 }
 
-/* Estado Accionado (Cuando el botón padre tiene .active, cambia el texto) */
 .tool-btn.active .btn-text::after {
     content: attr(data-text-on);
 }
 
 /* ==========================================================================
-   OCULTACIÓN INVISIBLE EN CELULARES (MÓVIL EN BLOGGER)
-   ========================================================================== */
-@media screen and (max-width: 540px) {
-    .tool-btn .btn-text {
-        display: none !important; /* Desaparece por completo en pantallas pequeñas */
-    }
-    .tool-btn {
-        padding: 16px 0 !important; 
-        justify-content: center !important;
-    }
-}
-/* ==========================================================================
-   CAJA PROTECTORA DEL MARCO DE IMAGEN (FRAME INNER LOCK)
+   CAJA PROTECTORA DEL MARCO DE IMAGEN
    ========================================================================== */
 .frame-wrapper {
     position: relative;
@@ -158,10 +135,9 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
-    
-    /* PROPIEDAD CLAVE: Bloquea los gestos nativos del navegador móvil en esta área */
     touch-action: none; 
 }
+
 .frame-wrapper img {
     width: 100%;
     height: 100%;
@@ -186,7 +162,6 @@ body {
     border-top: none;
 }
 
-/* METADATOS TÉCNICOS */
 .info-row {
     display: flex;
     justify-content: space-between;
@@ -198,28 +173,24 @@ body {
     color: #667684;
 }
 
-/* Distintivo de cortes transformado en texto plano elegante */
 .status-badge { 
-    background: transparent; 
-    padding: 0; 
     color: #00bcd4; 
     font-variant-numeric: tabular-nums;
     font-weight: 600;
 }
 
-/* ID del Loader / Estado */
 #loaderStatus {
     font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
-   BARRA DESLIZANTE (SLIDER TRACK) ULTRA-MINIMALISTA
+   BARRA DESLIZANTE ULTRA-MINIMALISTA
    ========================================================================== */
 .slider-control {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 3px; /* CAMBIADO: Línea de deslizamiento ultra delgada */
+    height: 3px;
     border-radius: 2px;
     background: rgba(255, 255, 255, 0.1);
     outline: none;
@@ -230,19 +201,19 @@ body {
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* BOTÓN DESLIZANTE (THUMB): Reducido de tamaño para diseño de aguja de precisión */
 .slider-control::-webkit-slider-thumb {
     -webkit-appearance: none; 
     appearance: none; 
-    width: 12px; /* Reducido de 22px a 12px */
+    width: 12px;
     height: 12px; 
     border-radius: 50%; 
     background: #00bcd4; 
     cursor: pointer;
     transition: transform 0.15s ease;
 }
+
 .slider-control::-webkit-slider-thumb:hover {
-    transform: scale(1.3); /* Crece sutilmente al poner el cursor encima */
+    transform: scale(1.3);
 }
 
 .slider-control::-moz-range-thumb {
@@ -254,94 +225,62 @@ body {
     cursor: pointer;
     transition: transform 0.15s ease;
 }
+
 .slider-control::-moz-range-thumb:hover {
     transform: scale(1.3);
 }
 
-/* ADAPTACIÓN MÓVILES */
-@media (max-height: 600px) and (orientation: landscape) {
-    .visor-container { padding: 10px; flex-direction: row; flex-wrap: wrap; }
-    .toolbar, .frame-wrapper, .controls-panel { max-width: 450px; }
-}
-/* // CAPA SUPERPUESTA DE MARCA DE AGUA (DISEÑO IDÉNTICO EN PC Y MÓVIL) */
-.watermark-overlay {
-    position: absolute;
-    /* Ubicación fija con margen proporcional (escalable en pantallas chicas) */
-    bottom: min(24px, 4%);                                     
-    right: min(24px, 4%);                                      
-    transform: none;                       
-    z-index: 10;
-    
-    /* BLOQUEO DE ERRORES MÓVILES (Fuerza la misma fuente en PC, Android e iOS) */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-style: italic;                    /* Mantiene estilo cursiva */
-    font-weight: 800;                      
-    text-transform: none;                  /* Respeta mayúsculas y minúsculas ingresadas */
-    white-space: nowrap;
-    
-    /* TIPOGRAFÍA FLUIDA Y CONTROLADA */
-    /* clamp(Mínimo, Cálculo Dinámico según contenedor, Máximo) */
-    font-size: clamp(12px, 1.5vw + 8px, 18px); 
-    letter-spacing: clamp(1px, 0.2vw, 2px);    /* Evita que las letras se amontonen en celulares */
-
-    /* PROTECCIÓN DE RENDERIZADO MÓVIL */
-    -webkit-text-size-adjust: 100%;        /* Evita que los iPhones alteren el tamaño diseñado */
-    text-rendering: optimizeLegibility;     /* Asegura bordes limpios en las letras */
-    -webkit-font-smoothing: antialiased;   /* Suaviza los pixeles en pantallas Retina/OLED */
-    
-    /* DEGRADADO DIAGONAL CON PREDOMINIO AMARILLO (SUTRE SOBRE TC DE NEGRO ABSOLUTO) */
-    background: linear-gradient(135deg, 
-        rgba(255, 235, 59, 0.45) 0%,   
-        rgba(255, 235, 59, 0.45) 50%,  /* El amarillo abarca el 60% del texto */
-        rgba(33, 150, 243, 0.45) 60%,  
-        rgba(244, 67, 54, 0.45) 95%   
-    );
-    
-    /* EFECTO DE RECORTE DE TEXTO */
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent; 
-    
-    /* INTERACCIONES TÁCTILES SIN BLOQUEOS */
-    pointer-events: none;                  /* Gestos táctiles atraviesan la capa */
-    user-select: none;                     /* Bloquea copiado accidental al arrastrar */
-    -webkit-user-select: none;
-}
-
 /* ==========================================================================
-   DISEÑO BASE PARA COMPU / PANTALLAS GRANDES (MUESTRA TEXTO + ICONO)
-   ========================================================================== */
-.tool-btn span {
-    display: inline-block; /* Asegura que el texto sea visible en PC */
-}
-
-.tool-btn svg {
-    width: 16px;  /* Tamaño estilizado estándar para escritorio */
-    height: 16px;
-    stroke-width: 1.8;
-}
-
-/* ==========================================================================
-   FILTRO PARA MÓVILES (ACTIVA SOLO ICONOS CUANDO EL IFRAME SE ENCOGE)
-   Calibrado a 540px para capturar con precisión el tamaño del iframe en celulares
+   MEDIA QUERIES UNIFICADOS (OPTIMIZACIÓN MÓVIL)
    ========================================================================== */
 @media screen and (max-width: 540px) {
-    /* 1. Oculta el texto de forma radical solo dentro del entorno móvil */
-    .tool-btn span {
+    .tool-btn .btn-text, .tool-btn span {
         display: none !important;
     }
-
-    /* 2. Centra los iconos de forma táctil en el espacio liberado */
     .tool-btn {
         padding: 16px 0 !important; 
         justify-content: center !important;
         min-width: 0 !important;
     }
-
-    /* 3. Agranda los iconos para que resalten al tacto en pantallas de celular */
     .tool-btn svg {
         width: 22px !important;   
         height: 22px !important;
-        stroke-width: 2.2 !important; /* Trazos más definidos para diagnóstico móvil */
+        stroke-width: 2.2 !important;
     }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    .visor-container { padding: 10px; flex-direction: row; flex-wrap: wrap; }
+    .toolbar, .frame-wrapper, .controls-panel { max-width: 450px; }
+}
+
+/* ==========================================================================
+   CAPA SUPERPUESTA DE MARCA DE AGUA
+   ========================================================================== */
+.watermark-overlay {
+    position: absolute;
+    bottom: min(24px, 4%);                                     
+    right: min(24px, 4%);                                      
+    z-index: 10;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-style: italic;                    
+    font-weight: 800;                      
+    white-space: nowrap;
+    font-size: clamp(12px, 1.5vw + 8px, 18px); 
+    letter-spacing: clamp(1px, 0.2vw, 2px);    
+    -webkit-text-size-adjust: 100%;        
+    text-rendering: optimizeLegibility;     
+    -webkit-font-smoothing: antialiased;   
+    background: linear-gradient(135deg, 
+        rgba(255, 235, 59, 0.45) 0%,   
+        rgba(255, 235, 59, 0.45) 50%,  
+        rgba(33, 150, 243, 0.45) 60%,  
+        rgba(244, 67, 54, 0.45) 95%   
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent; 
+    pointer-events: none;                  
+    user-select: none;                     
+    -webkit-user-select: none;
 }
