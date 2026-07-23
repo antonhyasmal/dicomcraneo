@@ -3,67 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor DICOM Profesional Completo</title>
-    
-    <!-- // ENLACE AL ARCHIVO DE ESTILOS EXTERNOS (CSS) -->
-    <!-- Vincula la apariencia visual, colores de la interfaz y comportamiento responsivo -->
+    <title>Visor DICOM Profesional</title>
+    <!-- Enlace a tu CSS optimizado (reemplaza la URL si es externa) -->
     <link rel="stylesheet" href="visordicomcss.css">
 </head>
 <body>
 
-    <!-- // CONTENEDOR DE CONTROL DE SCROLL GLOBAL -->
-    <!-- Define el largo de la página. A mayor altura en vh, más suave y preciso es el paso de imágenes -->
+    <!-- Contenedor estructural fijo (Evita crecimiento infinito) -->
     <div class="scroll-wrapper">
         
-        <!-- // CONTENEDOR FIJO EN PANTALLA (STICKY VISOR) -->
-        <!-- Mantiene la pantalla de diagnóstico clavada en el centro mientras el usuario hace scroll -->
-        <div class="visor-container">
+        <!-- Área de visualización centralizada -->
+        <main class="visor-container">
             
-            <!-- // BARRA DE HERRAMIENTAS SUPERIORES -->
-            <!-- Aloja los botones interactivos de autoplay, filtros avanzados, zoom y reinicio -->
-            <div class="toolbar">
-<button id="btnPlay" class="tool-btn">
-<svg xmlns="http://w3.org" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-<polygon points="6 3 20 12 6 21 6 3"></polygon></svg><!-- Los atributos van AQUÍ para que el CSS los pueda leer de inmediato --><span class="btn-text" data-text-off="Play" data-text-on="Pause"></span></button>
-<button id="btnInvert" class="tool-btn">
-<svg xmlns="http://w3.org" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-<path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10V2Z" fill="currentColor"></path><path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10V2Z"></path></svg><span>Invertir</span></button>
-<button id="btnContraste" class="tool-btn">
-<svg xmlns="http://w3.org" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-<path d="M12 2 2 12l10 10 10-10Z"/><path d="m12 2v20" /><path d="M12 6.5l5.5 5.5-5.5 5.5Z" fill="currentColor"/></svg><span>Contraste</span></button>
-<button id="btnZoom" class="tool-btn">
-<svg xmlns="http://w3.org" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg><span class="btn-text" data-text-off="Zoom" data-text-on="Normal"></span></button>
-<button id="btnReset" class="tool-btn">
-<svg xmlns="http://w3.org" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg><span>Reset</span></button>
+            <!-- 1. BARRA DE HERRAMIENTAS (TOOLBAR) UNIFICADA -->
+            <nav class="toolbar" aria-label="Herramientas del visor">
+                
+                <!-- Botón Reproducir (Cine Loop) -->
+                <button type="button" id="btnPlay" class="tool-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span class="btn-text" data-text-off="Play" data-text-on="Pausa"></span>
+                </button>
+
+                <!-- Botón Invertir Color -->
+                <button type="button" id="btnInvert" class="tool-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                        <path d="M12 18a6 6 0 1 0 0-12v12z"></path>
+                    </svg>
+                    <span class="btn-text" data-text-off="Invertir" data-text-on="Normal"></span>
+                </button>
+
+                <!-- Botón Ajuste Ventana (Brillo/Contraste) -->
+                <button type="button" id="btnContraste" class="tool-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="2" x2="12" y2="22"></line>
+                    </svg>
+                    <span class="btn-text" data-text-off="Ventana" data-text-on="Fijar"></span>
+                </button>
+
+                <!-- Botón Zoom / Paneo -->
+                <button type="button" id="btnZoom" class="tool-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <line x1="11" y1="8" x2="11" y2="14"></line>
+                        <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                    <span class="btn-text" data-text-off="Zoom" data-text-on="Zoom"></span>
+                </button>
+
+                <!-- Botón Restablecer (Reset) -->
+                <button type="button" id="btnReset" class="tool-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    <span class="btn-text" data-text-off="Reset" data-text-on="Reset"></span>
+                </button>
+            </nav>
+
+            <!-- 2. CAJA PROTECTORA DEL MARCO DE IMAGEN -->
+            <div id="wrapper" class="frame-wrapper">
+                <!-- Imagen DICOM Dinámica -->
+                <img id="dicomFrame" src="" alt="Corte Tomográfico DICOM" draggable="false">
+                
+                <!-- Capa de Marca de Agua (Filtro por CSS) -->
+                <div class="watermark-overlay">RadiologiaEC</div>
             </div>
 
-            <!-- // MARCO ENMARCADOR DEL VISOR DE IMÁGENES -->
-            <!-- Enmarca el estudio médico y recorta los desbordes laterales cuando el zoom está activo -->
-            <div class="frame-wrapper" id="wrapper">
-                <!-- Elemento de imagen puro donde se inyectan las capas radiológicas -->
-                <img id="dicomFrame" src="" alt="Cargando visor...">
-                <!-- NUEVA LÍNEA: Copia y pega esto justo debajo de la etiqueta <img> -->
-    <div class="watermark-overlay">RadiologiaEC</div>
-            </div>
-
-            <!-- // PANEL DE METADATOS Y CONTROL INFERIOR -->
-            <!-- Despliega los estados de carga del archivo, el contador de cortes y la barra deslizante manual -->
-            <div class="controls-panel">
+            <!-- 3. PANEL DE CONTROL INFERIOR (FOOTER PANEL) -->
+            <footer class="controls-panel">
+                <!-- Fila de Metadatos y Estados -->
                 <div class="info-row">
-                    <span id="loaderStatus">Inicializando componentes...</span>
-                    <span class="status-badge" id="frameCounter">0 / 0</span>
+                    <span id="loaderStatus">Cargando visor...</span>
+                    <span id="frameCounter" class="status-badge">0 / 0</span>
                 </div>
-                <!-- Barra de rango nativa ideal para control fino con el dedo en pantallas táctiles -->
-                <input type="range" id="frameSlider" class="slider-control" min="0" max="0" value="0" disabled>
-            </div>
 
-        </div>
+                <!-- Barra Deslizante de Precisión -->
+                <input type="range" id="frameSlider" class="slider-control" min="0" value="0" step="1" disabled aria-label="Control de fotogramas">
+            </footer>
+
+        </main>
     </div>
 
-    <!-- // ENLACE AL ARCHIVO DE LÓGICA (JAVASCRIPT) -->
-    <!-- Carga el código encargado de controlar las animaciones, gestos del mouse y precarga en memoria -->
-    <script src="visordicomjs.js"></script>
+    <!-- Enlace a tu JavaScript optimizado (Se ejecuta de último para no bloquear la carga) -->
+    <script src="visordicomjs.js" defer></script>
 </body>
 </html>
